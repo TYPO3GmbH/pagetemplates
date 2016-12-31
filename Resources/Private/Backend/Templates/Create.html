@@ -1,0 +1,13 @@
+{namespace core = TYPO3\CMS\Core\ViewHelpers}
+<div xmlns="http://www.w3.org/1999/xhtml" lang="en"
+     xmlns:f="http://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers">
+  <f:layout name="Main"/>
+  <f:section name="content">
+    <div class="row">
+      <f:form action="saveNewPage" controller="Backend">
+        <f:format.raw>{html}</f:format.raw>
+        <f:form.submit value="Save New Page" />
+      </f:form>
+    </div>
+  </f:section>
+</div>
