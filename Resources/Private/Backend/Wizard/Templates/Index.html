@@ -1,0 +1,15 @@
+{namespace core = TYPO3\CMS\Core\ViewHelpers}
+<div xmlns="http://www.w3.org/1999/xhtml" lang="en"
+     xmlns:f="http://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers">
+  <f:layout name="Main"/>
+  <f:section name="content">
+    <div class="row">
+      <f:debug>{templates}</f:debug>
+      <f:for each="{templates}" as="template" key="identifier">
+        <f:link.action action="create" controller="Wizard" extensionName="pagetemplates" arguments="{templateIdentifier: identifier}">
+          {template.name}
+        </f:link.action>
+      </f:for>
+    </div>
+  </f:section>
+</div>

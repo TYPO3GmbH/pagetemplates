@@ -1,0 +1,28 @@
+{namespace core = TYPO3\CMS\Core\ViewHelpers}
+<div xmlns="http://www.w3.org/1999/xhtml" lang="en"
+     xmlns:f="http://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers">
+  <f:layout name="Main"/>
+  <f:section name="content">
+    <div class="row">
+      <f:if condition="{forms}">
+        <f:form action="saveNewPage" controller="Wizard">
+          <f:for each="{forms}" as="form">
+            <h2>{form.description}</h2>
+            <f:format.raw>{form.formResult.html}</f:format.raw>
+            <f:for each="{form.readOnlyFields}" as="value" key="field">
+              <f:if condition="{field} !== pid && {field} !== CType && {field} !== colPos">
+                <div class="form-section">
+                  <div class="form-group t3js-formengine-validation-marker t3js-formengine-palette-field">
+                    <label class="t3js-formengine-label">{field}:</label>
+                    <div>{value}</div>
+                  </div>
+                </div>
+              </f:if>
+            </f:for>
+          </f:for>
+          <f:form.submit value="Save New Page"/>
+        </f:form>
+      </f:if>
+    </div>
+  </f:section>
+</div>
