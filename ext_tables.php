@@ -15,7 +15,7 @@ call_user_func(
                 'T3G.Pagetemplates',
                 'web',
                 'tx_Pagetemplates',
-                'top',
+                '',
                 [
                     'Backend' => 'index,create,saveNewPage',
                 ],

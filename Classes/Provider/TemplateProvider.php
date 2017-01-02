@@ -1,24 +1,35 @@
 <?php
 declare(strict_types = 1);
 
-
 namespace T3G\Pagetemplates\Provider;
-
 
 use Symfony\Component\Yaml\Yaml;
 
 class TemplateProvider
 {
     /**
+     * Path to configuration directory
+     *
      * @var string
      */
     private $configurationPath;
 
+    /**
+     * TemplateProvider constructor.
+     *
+     * @param string $configurationPath
+     */
     public function __construct(string $configurationPath)
     {
         $this->configurationPath = $configurationPath;
     }
 
+    /**
+     * Get configuration from yaml file for specific template
+     *
+     * @param string $templateIdentifier
+     * @return array
+     */
     public function getTemplateConfiguration(string $templateIdentifier) : array
     {
         $templatePath = $this->configurationPath . '/structure/' . $templateIdentifier . '.yaml';
@@ -30,7 +41,12 @@ class TemplateProvider
         }
     }
 
-    public function getTemplates()
+    /**
+     * Get all templates from configuration path
+     *
+     * @return array
+     */
+    public function getTemplates() : array
     {
         $files = $this->getYamlFilesInFolder($this->configurationPath);
         $templates = [];
@@ -42,6 +58,8 @@ class TemplateProvider
     }
 
     /**
+     * Get all yaml files in specific folder
+     *
      * @param string $path
      * @return array
      */

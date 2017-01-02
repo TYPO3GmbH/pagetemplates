@@ -17,8 +17,8 @@ class TemplateProviderTest extends \PHPUnit_Framework_TestCase
     public function getTemplatesReturnsTemplateArray()
     {
         $examplePath = __DIR__ . '/../../../Configuration/Templates';
-        $templateProvider = new TemplateProvider();
-        $templates = $templateProvider->getTemplates($examplePath);
+        $templateProvider = new TemplateProvider($examplePath);
+        $templates = $templateProvider->getTemplates();
         $expected = [
             'example1' =>
                 [
