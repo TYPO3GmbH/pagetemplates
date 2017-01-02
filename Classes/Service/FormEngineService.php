@@ -22,16 +22,17 @@ class FormEngineService
     public function createEditForm(array $configuration) : array
     {
         $formResultCompiler = GeneralUtility::makeInstance(FormResultCompiler::class);
-        $formResult = $this->getForm($configuration['page'], 'pages', (int)$_GET['id']);
-        $formResultCompiler->mergeResult($formResult['formResult']);
-        $forms[] = $formResult;
+        $form = $this->getForm($configuration['page'], 'pages', (int)$_GET['id']);
+        $form['formResult']['html'] .= $this->getIdentifierField($configuration);
+        $formResultCompiler->mergeResult($form['formResult']);
+        $forms[] = $form;
         unset($configuration['page']);
 
         foreach ($configuration as $table => $contentElements) {
             foreach ($contentElements as $contentElement) {
-                $formResult = $this->getForm($contentElement, $table, 0);
-                $formResultCompiler->mergeResult($formResult['formResult']);
-                $forms[] = $formResult;
+                $form = $this->getForm($contentElement, $table, 0);
+                $formResultCompiler->mergeResult($form['formResult']);
+                $forms[] = $form;
             }
         }
 
@@ -39,6 +40,20 @@ class FormEngineService
 
         $formResultCompiler->addCssFiles();
         return $forms;
+    }
+
+    /**
+     * Add a hidden field containing the configuration identifier
+     *
+     * @param array $configuration
+     * @return string
+     */
+    protected function getIdentifierField(array &$configuration) : string
+    {
+        $identifier = $configuration['__identifier'];
+        unset($configuration['__identifier']);
+
+        return '<input type="hidden" name="data[pages][' . $this->newPageUid . '][tx_pagetemplates_basetemplate]" value="' . $identifier . '" />';
     }
 
 

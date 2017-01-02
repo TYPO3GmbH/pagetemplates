@@ -5,31 +5,21 @@ declare(strict_types = 1);
 namespace T3G\Pagetemplates\Controller;
 
 use T3G\Pagetemplates\Provider\TemplateProvider;
+use T3G\Pagetemplates\Repository\PageRepository;
 use T3G\Pagetemplates\Service\FormEngineService;
 use T3G\Pagetemplates\View\BackendTemplateView;
-use TYPO3\CMS\Backend\Template\Components\ButtonBar;
-use TYPO3\CMS\Backend\Template\Components\MenuRegistry;
-use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
-use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
-class BackendController extends ActionController
+class WizardController extends AbstractController
 {
-    const MODULE_NAME = 'web_PagetemplatesTxPagetemplates';
-
-    /**
-     * @var FlashMessageService
-     */
-    protected $flashMessageService;
 
     /**
      * @var TemplateProvider
@@ -41,30 +31,6 @@ class BackendController extends ActionController
      */
     protected $configPath;
 
-    /**
-     * @var ButtonBar
-     */
-    protected $buttonBar;
-
-    /**
-     * @var ModuleTemplate
-     */
-    protected $moduleTemplate;
-
-    /**
-     * @var PageRenderer
-     */
-    protected $pageRenderer;
-
-    /**
-     * @var MenuRegistry
-     */
-    protected $menuRegistry;
-
-    /**
-     * @var BackendTemplateView
-     */
-    protected $defaultViewObjectName = BackendTemplateView::class;
 
     protected function addNoConfigFoundError()
     {
@@ -102,28 +68,6 @@ class BackendController extends ActionController
         $messageQueue->addMessage($flashMessage);
     }
 
-    /**
-     * Initialize view and add Css
-     *
-     * @param ViewInterface $view
-     */
-    protected function initializeView(ViewInterface $view)
-    {
-        /** @var BackendTemplateView $view */
-        parent::initializeView($view);
-        $this->moduleTemplate = $view->getModuleTemplate();
-        $this->pageRenderer = $this->moduleTemplate->getPageRenderer();
-        $this->buttonBar = $this->moduleTemplate->getDocHeaderComponent()->getButtonBar();
-        $this->menuRegistry = $this->moduleTemplate->getDocHeaderComponent()->getMenuRegistry();
-        $menuConfiguration = [
-            [
-                'controller' => 'Backend',
-                'action' => 'index',
-                'label' => 'Index',
-            ],
-        ];
-        $this->createMenu('pagetemplates_menu', $menuConfiguration);
-    }
 
     /**
      * Initialize action
@@ -132,11 +76,7 @@ class BackendController extends ActionController
     protected function initializeAction()
     {
         parent::initializeAction();
-        $this->flashMessageService = $flashMessageService = $this->objectManager->get(
-            FlashMessageService::class
-        );
-        $this->uriBuilder = $this->objectManager->get(UriBuilder::class);
-        $this->uriBuilder->setRequest($this->request);
+
         $id = (int)$_GET['id'];
         $pagesTSconfig = BackendUtility::getPagesTSconfig($id);
         $this->configPath = rtrim(GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']), '/');
@@ -159,6 +99,13 @@ class BackendController extends ActionController
     {
         $templates = $this->templateProvider->getTemplates();
         $this->view->assign('templates', $templates);
+    }
+
+    public function basedOnAction()
+    {
+        $pageRepository = $this->objectManager->get(PageRepository::class);
+        $pagesBasedOnTemplates = $pageRepository->getPagesBasedOnTemplates();
+        $this->view->assign('pages', $pagesBasedOnTemplates);
     }
 
     /**
@@ -222,37 +169,13 @@ class BackendController extends ActionController
         $frameworkConfiguration = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
         $viewConfiguration = [
             'view' => [
-                'templateRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Templates'],
-                'partialRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Partials'],
-                'layoutRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Layouts'],
+                'templateRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Templates'],
+                'partialRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Partials'],
+                'layoutRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Layouts'],
             ],
         ];
         $this->configurationManager->setConfiguration(array_merge($frameworkConfiguration, $viewConfiguration));
     }
 
-    /**
-     * create backend toolbar menu
-     *
-     * @param string $identifier
-     * @param array $menuConfiguration (needs to have the following keys: "controller", "action", "label")
-     * @api
-     */
-    protected function createMenu(string $identifier, array $menuConfiguration)
-    {
-        $menu = $this->menuRegistry->makeMenu();
-        $menu->setIdentifier($identifier);
 
-        foreach ($menuConfiguration as $menuItemConfiguration) {
-            $menuItem = $menu->makeMenuItem();
-            $isActive = $this->request->getControllerActionName() === $menuItemConfiguration['action'];
-            $uri = $this->uriBuilder->reset()->uriFor($menuItemConfiguration['action'], [], $menuItemConfiguration['controller']);
-            $menuItem
-                ->setTitle($menuItemConfiguration['label'])
-                ->setHref($uri)
-                ->setActive($isActive);
-            $menu->addMenuItem($menuItem);
-        }
-
-        $this->menuRegistry->addMenu($menu);
-    }
 }

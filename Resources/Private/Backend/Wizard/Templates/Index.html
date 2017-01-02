@@ -6,7 +6,7 @@
     <div class="row">
       <f:debug>{templates}</f:debug>
       <f:for each="{templates}" as="template" key="identifier">
-        <f:link.action action="create" controller="Backend" extensionName="pagetemplates" arguments="{templateIdentifier: identifier}">
+        <f:link.action action="create" controller="Wizard" extensionName="pagetemplates" arguments="{templateIdentifier: identifier}">
           {template.name}
         </f:link.action>
       </f:for>

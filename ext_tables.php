@@ -13,7 +13,8 @@ call_user_func(
                 'tx_Pagetemplates',
                 '',
                 [
-                    'Backend' => 'index,create,saveNewPage',
+                    'Wizard' => 'index,create,saveNewPage',
+                    'Management' => 'basedOn'
                 ],
                 [
                     'access' => 'user,group',

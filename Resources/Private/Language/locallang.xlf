@@ -30,6 +30,18 @@
             <trans-unit id="no_page_selected.message">
                 <source>Please select a parent page in the tree!</source>
             </trans-unit>
+            <trans-unit id="pages.table.headline">
+                <source>Pages based on templates currently in the system:</source>
+            </trans-unit>
+            <trans-unit id="page.editForm">
+                <source>Edit page</source>
+            </trans-unit>
+            <trans-unit id="page.goto_web">
+                <source>Go to page module</source>
+            </trans-unit>
+            <trans-unit id="pages.templateUsed">
+                <source>Template used</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
