@@ -7,15 +7,11 @@ namespace T3G\Pagetemplates\Controller;
 use T3G\Pagetemplates\Provider\TemplateProvider;
 use T3G\Pagetemplates\Repository\PageRepository;
 use T3G\Pagetemplates\Service\FormEngineService;
-use T3G\Pagetemplates\View\BackendTemplateView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
-use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class WizardController extends AbstractController
@@ -32,6 +28,9 @@ class WizardController extends AbstractController
     protected $configPath;
 
 
+    /**
+     * Add flash message if the config directory cannot be found.
+     */
     protected function addNoConfigFoundError()
     {
         $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
@@ -44,6 +43,9 @@ class WizardController extends AbstractController
         $messageQueue->addMessage($flashMessage);
     }
 
+    /**
+     * Add flash message if tsconfig is not set.
+     */
     protected function addNoTsConfigSetInfo()
     {
         $headline = LocalizationUtility::translate('config_dir_not_set.headline', 'pagetemplates');
@@ -56,6 +58,9 @@ class WizardController extends AbstractController
         $messageQueue->addMessage($flashMessage);
     }
 
+    /**
+     * Add flash message if no page is selected.
+     */
     protected function addSelectPageInfo()
     {
         $headline = LocalizationUtility::translate('no_page_selected.headline', 'pagetemplates');
@@ -93,7 +98,7 @@ class WizardController extends AbstractController
     }
 
     /**
-     * Display available templates
+     * Display available templates.
      */
     public function indexAction()
     {
@@ -101,15 +106,8 @@ class WizardController extends AbstractController
         $this->view->assign('templates', $templates);
     }
 
-    public function basedOnAction()
-    {
-        $pageRepository = $this->objectManager->get(PageRepository::class);
-        $pagesBasedOnTemplates = $pageRepository->getPagesBasedOnTemplates();
-        $this->view->assign('pages', $pagesBasedOnTemplates);
-    }
-
     /**
-     * Display the edit form for the chosen template
+     * Display the edit form for the chosen template.
      *
      * @param string $templateIdentifier
      */
@@ -139,7 +137,7 @@ class WizardController extends AbstractController
 
     /**
      * save template as new page
-     * and send the user to the page module
+     * and send the user to the page module.
      */
     public function saveNewPageAction()
     {
@@ -160,7 +158,7 @@ class WizardController extends AbstractController
     }
 
     /**
-     * Set Backend Module Templates
+     * Set Backend Module Templates.
      *
      * @return void
      */

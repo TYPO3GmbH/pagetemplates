@@ -11,10 +11,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FormEngineService
 {
+    /**
+     * Store generated NEW1234 string for referencing the page
+     *
+     * @var string
+     */
     protected $newPageUid = '';
 
     /**
-     * Returns form engine forms array for editing the template
+     * Returns form engine forms array for editing the template.
      *
      * @param array $configuration
      * @return array
@@ -43,7 +48,7 @@ class FormEngineService
     }
 
     /**
-     * Add a hidden field containing the configuration identifier
+     * Add a hidden field containing the configuration identifier.
      *
      * @param array $configuration
      * @return string
@@ -58,7 +63,7 @@ class FormEngineService
 
 
     /**
-     * Renders hidden fields for default data that is not editable in the wizard
+     * Renders hidden fields for default data that is not editable in the wizard.
      *
      * @param string $table
      * @param array $defaults
@@ -127,7 +132,7 @@ class FormEngineService
 
     /**
      * Generates a list of fields that aren't rendered as form fields but have default values set
-     * --> should then be rendered as hidden fields
+     * --> should then be rendered as hidden fields.
      *
      * @param array $fieldsRendered
      * @param array $defaults

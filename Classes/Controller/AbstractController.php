@@ -43,6 +43,12 @@ class AbstractController extends ActionController
      */
     protected $moduleTemplate;
 
+
+    /**
+     * Initialize View.
+     *
+     * @param ViewInterface $view
+     */
     protected function initializeView(ViewInterface $view)
     {
         parent::initializeView($view);
@@ -67,6 +73,9 @@ class AbstractController extends ActionController
         }
     }
 
+    /**
+     * Initialize Action.
+     */
     protected function initializeAction()
     {
         parent::initializeAction();
@@ -78,7 +87,7 @@ class AbstractController extends ActionController
     }
 
     /**
-     * create backend toolbar menu
+     * Create backend toolbar menu.
      *
      * @param string $identifier
      * @param array $menuConfiguration (needs to have the following keys: "controller", "action", "label")

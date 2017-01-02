@@ -12,7 +12,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class PageRepository
 {
 
-    public function getPagesBasedOnTemplates()
+    /**
+     * Get pages that have a basetemplate set.
+     *
+     * @return array
+     */
+    public function getPagesBasedOnTemplates() : array
     {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('pages');

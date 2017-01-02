@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Yaml;
 class TemplateProvider
 {
     /**
-     * Path to configuration directory
+     * Path to configuration directory.
      *
      * @var string
      */
@@ -25,7 +25,7 @@ class TemplateProvider
     }
 
     /**
-     * Get configuration from yaml file for specific template
+     * Get configuration from yaml file for specific template.
      *
      * @param string $templateIdentifier
      * @return array
@@ -44,7 +44,7 @@ class TemplateProvider
     }
 
     /**
-     * Get all templates from configuration path
+     * Get all templates from configuration path.
      *
      * @return array
      */
@@ -60,7 +60,7 @@ class TemplateProvider
     }
 
     /**
-     * Get all yaml files in specific folder
+     * Get all yaml files in specific folder.
      *
      * @param string $path
      * @return array

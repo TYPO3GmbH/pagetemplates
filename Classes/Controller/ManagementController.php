@@ -15,17 +15,28 @@ class ManagementController extends AbstractController
      */
     protected $pageRepository;
 
+    /**
+     * Inject page repository.
+     *
+     * @param PageRepository $pageRepository
+     */
     public function injectPageRepository(PageRepository $pageRepository)
     {
         $this->pageRepository = $pageRepository;
     }
 
+    /**
+     * Initialize Action.
+     */
     protected function initializeAction()
     {
         parent::initializeAction();
         $this->setBackendModuleTemplates();
     }
 
+    /**
+     * Action to display pages based on templates
+     */
     public function basedOnAction()
     {
         $pagesBasedOnTemplates = $this->pageRepository->getPagesBasedOnTemplates();
@@ -43,8 +54,6 @@ class ManagementController extends AbstractController
 
     /**
      * Set Backend Module Templates
-     *
-     * @return void
      */
     private function setBackendModuleTemplates()
     {
