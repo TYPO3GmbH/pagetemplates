@@ -20,8 +20,8 @@ Folder structure:
 
 - Templates.yaml
   - Structure
-    - template1.yaml
-    - template2.yaml
+    - example1.yaml
+    - example2.yaml
     
     
 Main Templates.yaml file contains the configuration for the available templates:
@@ -33,14 +33,14 @@ Main Templates.yaml file contains the configuration for the available templates:
         description: "This is an example template for use in the templates extension."
     example2:
         name: "Example Template 2"
-        previewImage: "EXT:pagetemplates/ext_icon.svg"
+        previewImage: "EXT:pagetemplates/ext_icon2.svg"
         description: "This is an example template for use in the templates extension."
 ```
 
-The keys are the template identifier (the file name for the configuration of a single template). Name, previewImage
+The keys are the template identifiers (the file name for the configuration of a single template). Name, previewImage
 and description are used for displaying a preview of the chosen template.
 
-A single template configuration could for example look like this:
+A single template configuration looks like this:
 
 ```yaml
     page:
