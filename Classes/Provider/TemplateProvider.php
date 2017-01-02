@@ -32,12 +32,12 @@ class TemplateProvider
      */
     public function getTemplateConfiguration(string $templateIdentifier) : array
     {
-        $templatePath = $this->configurationPath . '/structure/' . $templateIdentifier . '.yaml';
+        $templatePath = $this->configurationPath . '/Structure/' . $templateIdentifier . '.yaml';
         if (file_exists($templatePath)) {
             $content = file_get_contents($templatePath);
             return Yaml::parse($content);
         } else {
-            throw new \InvalidArgumentException('Template path ' . htmlspecialchars($templatePath) . ' does not exist.');
+            throw new \InvalidArgumentException('Template not found:' . htmlspecialchars($templatePath), 1483357769811);
         }
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2015-06-23T11:36:30Z">
+        <header>
+            <authorName>TYPO3</authorName>
+            <authorEmail>info@typo3.com</authorEmail>
+        </header>
+        <body>
+            <trans-unit id="exception.1483357769811.headline">
+                <source>Template not found!</source>
+            </trans-unit>
+            <trans-unit id="exception.1483357769811.message">
+                <source>Could not find template for %s in path %s!</source>
+            </trans-unit>
+            <trans-unit id="config_dir_not_found.headline">
+                <source>Could not find configuration directory!</source>
+            </trans-unit>
+            <trans-unit id="config_dir_not_found.message">
+                <source>Configured directory was %s! Make sure to set the correct path in Page TSConfig mod.web_PagetemplatesTxPagetemplates.storagePath.</source>
+            </trans-unit>
+            <trans-unit id="config_dir_not_set.headline">
+                <source>Configuration directory is not set.</source>
+            </trans-unit>
+            <trans-unit id="config_dir_not_set.message">
+                <source>Make sure to set the path to your template configuration in Page TSConfig, for example: mod.web_PagetemplatesTxPagetemplates.storagePath = EXT:yourext/Resources/Private/Templates.</source>
+            </trans-unit>
+            <trans-unit id="no_page_selected.headline">
+                <source>No page selected.</source>
+            </trans-unit>
+            <trans-unit id="no_page_selected.message">
+                <source>Please select a parent page in the tree!</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

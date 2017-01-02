@@ -50,7 +50,7 @@ class FormEngineService
      * @param string $newUid
      * @return string
      */
-    protected function getAdditionalFields(string $table, array $defaults, string $newUid) : string
+    protected function getHiddenFields(string $table, array $defaults, string $newUid) : string
     {
         $additionalFields = '';
         foreach ($defaults as $field => $default) {
@@ -102,7 +102,7 @@ class FormEngineService
             $defaults['pid'] = $this->newPageUid;
         }
         $fieldsNotYetRendered = $this->prepareFieldsNotYetRendered($fieldsRendered, $defaults);
-        $additionalFields = $this->getAdditionalFields($table, $fieldsNotYetRendered, $newUid);
+        $additionalFields = $this->getHiddenFields($table, $fieldsNotYetRendered, $newUid);
 
         $formResult['html'] .= $additionalFields;
         $result['formResult'] = $formResult;

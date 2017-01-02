@@ -12,16 +12,24 @@ use TYPO3\CMS\Backend\Template\Components\MenuRegistry;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class BackendController extends ActionController
 {
     const MODULE_NAME = 'web_PagetemplatesTxPagetemplates';
+
+    /**
+     * @var FlashMessageService
+     */
+    protected $flashMessageService;
 
     /**
      * @var TemplateProvider
@@ -58,6 +66,42 @@ class BackendController extends ActionController
      */
     protected $defaultViewObjectName = BackendTemplateView::class;
 
+    protected function addNoConfigFoundError()
+    {
+        $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
+        $message = sprintf(
+            LocalizationUtility::translate('config_dir_not_found.message', 'pagetemplates'),
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+        );
+        $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
+        $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
+        $messageQueue->addMessage($flashMessage);
+    }
+
+    protected function addNoTsConfigSetInfo()
+    {
+        $headline = LocalizationUtility::translate('config_dir_not_set.headline', 'pagetemplates');
+        $message = sprintf(
+            LocalizationUtility::translate('config_dir_not_set.message', 'pagetemplates'),
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+        );
+        $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
+        $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
+        $messageQueue->addMessage($flashMessage);
+    }
+
+    protected function addSelectPageInfo()
+    {
+        $headline = LocalizationUtility::translate('no_page_selected.headline', 'pagetemplates');
+        $message = sprintf(
+            LocalizationUtility::translate('no_page_selected.message', 'pagetemplates'),
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+        );
+        $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
+        $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
+        $messageQueue->addMessage($flashMessage);
+    }
+
     /**
      * Initialize view and add Css
      *
@@ -88,10 +132,22 @@ class BackendController extends ActionController
     protected function initializeAction()
     {
         parent::initializeAction();
+        $this->flashMessageService = $flashMessageService = $this->objectManager->get(
+            FlashMessageService::class
+        );
         $this->uriBuilder = $this->objectManager->get(UriBuilder::class);
         $this->uriBuilder->setRequest($this->request);
-        $pagesTSconfig = BackendUtility::getPagesTSconfig((int)$_GET['id']);
-        $this->configPath = GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']);
+        $id = (int)$_GET['id'];
+        $pagesTSconfig = BackendUtility::getPagesTSconfig($id);
+        $this->configPath = rtrim(GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']), '/');
+
+        if ($id === 0) {
+            $this->addSelectPageInfo();
+        } elseif (empty($this->configPath)) {
+            $this->addNoTsConfigSetInfo();
+        } elseif (!is_dir($this->configPath)) {
+            $this->addNoConfigFoundError();
+        }
         $this->setBackendModuleTemplates();
         $this->templateProvider = $this->objectManager->get(TemplateProvider::class, $this->configPath);
     }
@@ -112,12 +168,26 @@ class BackendController extends ActionController
      */
     public function createAction(string $templateIdentifier)
     {
-        $configuration = $this->templateProvider->getTemplateConfiguration($templateIdentifier);
-
-        $formEngineService = $this->objectManager->get(FormEngineService::class);
-        $forms = $formEngineService->createEditForm($configuration);
-        $this->view->assign('forms', $forms);
-
+        try {
+            $configuration = $this->templateProvider->getTemplateConfiguration($templateIdentifier);
+            $formEngineService = $this->objectManager->get(FormEngineService::class);
+            $forms = $formEngineService->createEditForm($configuration);
+            $this->view->assign('forms', $forms);
+        } catch (\InvalidArgumentException $e) {
+            if ($e->getCode() === 1483357769811) {
+                $headline = LocalizationUtility::translate('exception.1483357769811.headline', 'pagetemplates');
+                $message = sprintf(
+                    LocalizationUtility::translate('exception.1483357769811.message', 'pagetemplates'),
+                    htmlspecialchars($templateIdentifier),
+                    htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+                );
+                $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
+                $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
+                $messageQueue->addMessage($flashMessage);
+            } else {
+                throw $e;
+            }
+        }
     }
 
     /**
