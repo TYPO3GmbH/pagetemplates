@@ -42,6 +42,12 @@
             <trans-unit id="pages.templateUsed">
                 <source>Template used</source>
             </trans-unit>
+            <trans-unit id="pages.title">
+                <source>Title</source>
+            </trans-unit>
+            <trans-unit id="wizard.button.create">
+                <source>Use this template</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
