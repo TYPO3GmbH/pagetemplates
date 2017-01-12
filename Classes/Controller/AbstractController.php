@@ -70,6 +70,7 @@ class AbstractController extends ActionController
                 ],
             ];
             $this->createMenu('pagetemplates_menu', $menuConfiguration);
+            $this->moduleTemplate->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/EqualHeight');
         }
     }
 
