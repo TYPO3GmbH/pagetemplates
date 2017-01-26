@@ -93,7 +93,6 @@ class WizardController extends AbstractController
         } elseif (!is_dir($this->configPath)) {
             $this->addNoConfigFoundError();
         }
-        $this->setBackendModuleTemplates();
         $this->templateProvider = $this->objectManager->get(TemplateProvider::class, $this->configPath);
     }
 
@@ -156,24 +155,5 @@ class WizardController extends AbstractController
         $pageModuleUrl = BackendUtility::getModuleUrl('web_layout', ['id' => $realPid]);
         $this->redirectToUri($pageModuleUrl);
     }
-
-    /**
-     * Set Backend Module Templates.
-     *
-     * @return void
-     */
-    private function setBackendModuleTemplates()
-    {
-        $frameworkConfiguration = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
-        $viewConfiguration = [
-            'view' => [
-                'templateRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Templates'],
-                'partialRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Partials'],
-                'layoutRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Wizard/Layouts'],
-            ],
-        ];
-        $this->configurationManager->setConfiguration(array_merge($frameworkConfiguration, $viewConfiguration));
-    }
-
 
 }

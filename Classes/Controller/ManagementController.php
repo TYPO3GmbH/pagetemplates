@@ -26,15 +26,6 @@ class ManagementController extends AbstractController
     }
 
     /**
-     * Initialize Action.
-     */
-    protected function initializeAction()
-    {
-        parent::initializeAction();
-        $this->setBackendModuleTemplates();
-    }
-
-    /**
      * Action to display pages based on templates
      */
     public function basedOnAction()
@@ -49,22 +40,5 @@ class ManagementController extends AbstractController
                 'returnUrl',
                 urlencode($this->uriBuilder->reset()->uriFor('basedOn', [], 'Management'))
             );
-    }
-
-
-    /**
-     * Set Backend Module Templates
-     */
-    private function setBackendModuleTemplates()
-    {
-        $frameworkConfiguration = $this->configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
-        $viewConfiguration = [
-            'view' => [
-                'templateRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Management/Templates'],
-                'partialRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Management/Partials'],
-                'layoutRootPaths' => ['EXT:pagetemplates/Resources/Private/Backend/Management/Layouts'],
-            ],
-        ];
-        $this->configurationManager->setConfiguration(array_merge($frameworkConfiguration, $viewConfiguration));
     }
 }
