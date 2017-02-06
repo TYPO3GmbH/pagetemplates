@@ -1,13 +1,11 @@
 <?php
 declare(strict_types = 1);
-
-
 namespace T3G\Pagetemplates\Tests\Unit\Provider;
 
-
+use PHPUnit\Framework\TestCase;
 use T3G\Pagetemplates\Provider\TemplateProvider;
 
-class TemplateProviderTest extends \PHPUnit_Framework_TestCase
+class TemplateProviderTest extends TestCase
 {
 
     /**
