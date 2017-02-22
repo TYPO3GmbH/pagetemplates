@@ -1,11 +1,24 @@
 Page Templates for TYPO3
 ========================
 
+This extension provides the possibility to provide and easily use boilerplates for page creation.
+
+Simple mode
+-----------
+
+The simple mode must be enabled by the integrator within the extension manager. With this switch the Page Template 
+module will be disabled and a new optin in the click menu is enabled. 
+Also she must provide the UID of the storage folder of the page template. 
+An editor now can create pages with content elements within this storage folder.
+
+
+YAML mode
+---------
+
 Provides yaml based templates for TYPO3 pages. Allows an editor to select a page template for creating a new page.
 Allows editing of page and content properties on creation.
+After disabling the simple mode in the extension manager, a new module will be displayed.
 
-Configuration
--------------
 
 ### Page TSConfig:
 
