@@ -1,0 +1,6 @@
+# cat=basic/enable/1; type=boolean; label=Enable simple mode:This setting toggles the module "Page Templates for TYPO3" by enabeling a simple mode were just define a starge folder with predefined pages to be used as template.
+enableSimpleMode = false
+
+# cat=basic/enable/2; type=string; label=Template storage folder:Only needed is the simple mode is enabled. This is the page (or a csv list of pages) with all predifined templates.
+templateStorageFolder =
+
