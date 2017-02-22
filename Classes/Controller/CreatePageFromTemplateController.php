@@ -66,7 +66,7 @@ class CreatePageFromTemplateController extends AbstractModule
     /**
      * @var string
      */
-    protected $position = 'inside';
+    protected $position = 'firstSubpage';
 
     /**
      * Constructor
@@ -165,10 +165,19 @@ class CreatePageFromTemplateController extends AbstractModule
                     GeneralUtility::linkThisScript(
                         [
                             'templateUid' => $template['uid'],
-                            'position' => 'inside'
+                            'position' => 'firstSubpage'
                         ]
                     )
                 ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_as_first_subpage') . '</a></li>';
+
+            $content .= '<li><a href="' . htmlspecialchars(
+                    GeneralUtility::linkThisScript(
+                        [
+                            'templateUid' => $template['uid'],
+                            'position' => 'lastSubpage'
+                        ]
+                    )
+                ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_as_last_subpage') . '</a></li>';
 
             $content .= '<li><a href="' . htmlspecialchars(
                     GeneralUtility::linkThisScript(

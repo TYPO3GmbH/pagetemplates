@@ -19,12 +19,12 @@ class CreatePageFromTemplateService
      */
     public function getTemplatesFromDatabase(): array
     {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates']);
+        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'], ['allowed_classes' => false]);
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()
             ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            ->add(new DeletedRestriction());
         $templates = $queryBuilder->select('*')
             ->from('pages')
             ->where(
@@ -40,21 +40,13 @@ class CreatePageFromTemplateService
      * @param int $targetUid
      * @param string $position
      */
-    public function createPageFromTemplate(int $templateUid, int $targetUid, string $position = 'inside')
+    public function createPageFromTemplate(int $templateUid, int $targetUid, string $position)
     {
-        switch ($position) {
-            case 'inside';
-                break;
-            case 'below';
-                $targetUid *= -1;
-                break;
-        }
-
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $data = [
             'pages' => [
                 $templateUid => [
-                    'copy' => $targetUid,
+                    'copy' => $this->getManipulatedTargetUidForDataHandler($targetUid, $position),
                 ],
             ],
         ];
@@ -72,4 +64,46 @@ class CreatePageFromTemplateService
         HttpUtility::redirect($url);
     }
 
+    /**
+     * @param int $targetUid
+     * @return int
+     */
+    protected function getUidOfLastSubpage(int $targetUid): int
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
+        $queryBuilder->getRestrictions()
+            ->removeAll()
+            ->add(new DeletedRestriction());
+        $templates = $queryBuilder->select('*')
+            ->from('pages')
+            ->where(
+                $queryBuilder->expr()->eq('pid', $targetUid)
+            )
+            ->orderBy('sorting', 'DESC')
+            ->execute()
+            ->fetch();
+        return (int)$templates['uid'];
+    }
+
+    /**
+     * @param int $targetUid
+     * @param string $position
+     * @return int
+     */
+    protected function getManipulatedTargetUidForDataHandler(int $targetUid, string $position): int
+    {
+        switch ($position) {
+            case 'below';
+                $targetUid *= -1;
+                break;
+            case 'lastSubpage';
+                $targetUid = 0 - $this->getUidOfLastSubpage($targetUid);
+                break;
+            case 'firstSubpage';
+            default:
+                break;
+        }
+        return $targetUid;
+    }
 }

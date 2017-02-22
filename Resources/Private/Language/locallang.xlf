@@ -55,6 +55,9 @@
             <trans-unit id="label.create_as_first_subpage">
                 <source>Create as first subpage</source>
             </trans-unit>
+            <trans-unit id="label.create_as_last_subpage">
+                <source>Create as last subpage</source>
+            </trans-unit>
             <trans-unit id="label.create_below_this_page">
                 <source>Create below this page</source>
             </trans-unit>
