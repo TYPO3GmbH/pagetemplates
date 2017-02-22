@@ -18,15 +18,11 @@ namespace T3G\Pagetemplates\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use T3G\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\HttpUtility;
 
 class CreatePageFromTemplateController extends AbstractModule
 {
@@ -60,7 +56,17 @@ class CreatePageFromTemplateController extends AbstractModule
     /**
      * @var array
      */
-    private $pageinfo = [];
+    protected $pageinfo = [];
+
+    /**
+     * @var CreatePageFromTemplateService
+     */
+    protected $service;
+
+    /**
+     * @var string
+     */
+    protected $position = 'inside';
 
     /**
      * Constructor
@@ -68,6 +74,7 @@ class CreatePageFromTemplateController extends AbstractModule
     public function __construct()
     {
         parent::__construct();
+        $this->service = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
         $GLOBALS['SOBE'] = $this;
         $this->getLanguageService()->includeLLFile('EXT:lang/Resources/Private/Language/locallang_misc.xlf');
         $this->init();
@@ -81,6 +88,7 @@ class CreatePageFromTemplateController extends AbstractModule
         // The page id to operate from
         $this->targetUid = (int)GeneralUtility::_GP('targetUid');
         $this->templateUid = (int)GeneralUtility::_GP('templateUid');
+        $this->position = GeneralUtility::_GP('position');
         $this->returnUrl = GeneralUtility::sanitizeLocalUrl(GeneralUtility::_GP('returnUrl'));
 
         // Creating content
@@ -95,39 +103,29 @@ class CreatePageFromTemplateController extends AbstractModule
     }
 
     /**
-     * Injects the request object for the current request or subrequest
-     * As this controller goes only through the main() method, it is rather simple for now
-     *
      * @param ServerRequestInterface $request the current request
      * @param ResponseInterface $response
      * @return ResponseInterface the response with the content
      */
     public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $this->main();
+        if ($this->templateUid !== 0) {
+            $this->service->createPageFromTemplate($this->templateUid, $this->targetUid, $this->position);
+        } else {
+            $this->renderModuleHeader();
+            $this->renderTemplateSelector();
+        }
+        $this->content .= '<div>' . $this->code . '</div>';
+        $this->moduleTemplate->setContent($this->content);
 
         $response->getBody()->write($this->moduleTemplate->renderContent());
         return $response;
     }
 
     /**
-     * Main processing, creating the list of new record tables to select from
      *
-     * @return void
      */
-    public function main()
-    {
-        if ($this->templateUid !== 0) {
-            $this->createPageFromTemplate();
-        } else {
-            $this->renderSelector();
-        }
-        $this->content .= '<div>' . $this->code . '</div>';
-        $this->moduleTemplate->setContent($this->content);
-
-    }
-
-    protected function renderSelector()
+    protected function renderModuleHeader()
     {
         // If there was a page - or if the user is admin (admins has access to the root) we proceed:
         if (!empty($this->pageinfo['uid']) || $this->getBackendUserAuthentication()->isAdmin()) {
@@ -144,63 +142,15 @@ class CreatePageFromTemplateController extends AbstractModule
                 $title = $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'];
             }
             $this->moduleTemplate->setTitle($title);
-
-            //$this->getPositions();
-            $this->getTemplates();
         }
     }
 
-    protected function createPageFromTemplate()
+    /**
+     *
+     */
+    protected function renderTemplateSelector()
     {
-        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $data = [
-            'pages' => [
-                $this->templateUid => [
-                    'copy' => $this->targetUid,
-                ],
-            ],
-        ];
-        $dataHandler->start([], $data);
-        $dataHandler->process_cmdmap();
-
-        $newPageUid = $dataHandler->copyMappingArray['pages'][$this->templateUid];
-
-        $urlParameters = [
-            'id' => $newPageUid,
-            'table' => 'pages'
-        ];
-        $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
-        @ob_end_clean();
-        HttpUtility::redirect($url);
-    }
-
-    protected function getPositions()
-    {
-        $this->code .= '<div>
-    <input type="radio" id="firstSubpage" name="position" value="firstSubpage" checked="checked">
-    <label for="firstSubpage">Insert as first subpage</label><br> 
-    <input type="radio" id="lastSubpage" name="position" value="lastSubpage">
-    <label for="lastSubpage">Insert as last subpage</label><br> 
-    <input type="radio" id="belowPage" name="position" value="belowPage">
-    <label for="belowPage">Insert below this page</label> 
-        </div>';
-    }
-
-    protected function getTemplates()
-    {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates']);
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
-        $queryBuilder->getRestrictions()
-            ->removeAll()
-            ->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-        $templates = $queryBuilder->select('*')
-            ->from('pages')
-            ->where(
-                $queryBuilder->expr()->eq('pid', $extensionConfiguration['templateStorageFolder'])
-            )
-            ->execute()
-            ->fetchAll();
+        $templates = $this->service->getTemplatesFromDatabase();
 
         $pageIcon = $this->moduleTemplate
             ->getIconFactory()
@@ -210,33 +160,28 @@ class CreatePageFromTemplateController extends AbstractModule
         $content = '<ul>';
 
         foreach ($templates as $template) {
-
             $content .= '<li>' . $pageIcon . htmlspecialchars($template['title']) . '<ul>';
-
             $content .= '<li><a href="' . htmlspecialchars(
-                GeneralUtility::linkThisScript(
-                    [
-                        'templateUid' => $template['uid']
-                    ]
-                )
+                    GeneralUtility::linkThisScript(
+                        [
+                            'templateUid' => $template['uid'],
+                            'position' => 'inside'
+                        ]
+                    )
                 ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_as_first_subpage') . '</a></li>';
 
-
-
             $content .= '<li><a href="' . htmlspecialchars(
-                GeneralUtility::linkThisScript(
-                    [
-                        'templateUid' => $template['uid']
-                    ]
-                )
+                    GeneralUtility::linkThisScript(
+                        [
+                            'templateUid' => $template['uid'],
+                            'position' => 'below'
+                        ]
+                    )
                 ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below_this_page') . '</a></li>';
-
             $content .= '</ul></li>';
 
         }
-
         $content .= '</ul>';
-
         $this->code .= '<div>' . $content . '</div>';
     }
 
@@ -259,4 +204,6 @@ class CreatePageFromTemplateController extends AbstractModule
     {
         return $GLOBALS['BE_USER'];
     }
+
+
 }
