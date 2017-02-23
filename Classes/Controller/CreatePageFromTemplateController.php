@@ -21,29 +21,33 @@ use Psr\Http\Message\ServerRequestInterface;
 use T3G\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * This controller is called via the click menu entry "Create page from template.
- * To enable the entry in the menu, you need to enable the simple mode in the 
+ * To enable the entry in the menu, you need to enable the simple mode in the
  * extension manger and define the storage folder where you plan to store your
- * templates.  
+ * templates.
  */
 class CreatePageFromTemplateController extends AbstractModule
 {
+
+    /**
+     * @var StandaloneView
+     */
+    protected $view;
 
     /**
      * @var CreatePageFromTemplateService
      */
     protected $createPageFromTemplateService;
 
-
     /**
-     * @param ServerRequestInterface $request the current request
+     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @return ResponseInterface the response with the content
+     * @return ResponseInterface
      */
     public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -51,12 +55,14 @@ class CreatePageFromTemplateController extends AbstractModule
         $targetUid = (int)GeneralUtility::_GP('targetUid');
         $templateUid = (int)GeneralUtility::_GP('templateUid');
 
-        $templateSelectorHtml = '';
-
+        /**
+         * If a templateUid is transmitted, it is to assume, that this page should be copied to the $targetUid.
+         * Afterwards the user will be redirected to the page module of the newly created page
+         */
         if ($templateUid !== 0) {
-            // If a templateUid is transmitted, it is to assume, that this page should be copied to the $targetUid.
             $position = GeneralUtility::_GP('position') ?: 'firstSubpage';
-            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate($templateUid, $targetUid, $position);
+            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate($templateUid, $targetUid,
+                $position);
             $urlParameters = [
                 'id' => $newPageUid,
                 'table' => 'pages'
@@ -64,19 +70,20 @@ class CreatePageFromTemplateController extends AbstractModule
             $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
             BackendUtility::setUpdateSignal('updatePageTree');
             HttpUtility::redirect($url);
-        } else {
-            // Otherwise all templates should be listed.
-            $this->renderModuleHeader($targetUid);
-            $templateSelectorHtml = $this->renderTemplateSelector();
         }
-        $content = '<h1>'
-            . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template')
-            . '</h1>';
-        $content .= $templateSelectorHtml;
-        $this->moduleTemplate->setContent($content);
+        /**
+         * Otherwise all templates should be listed.
+         */
+        $view = $this->getFluidTemplateObject('Main');
+        $view->assign('templates', $this->getTemplates());
 
+        $this->renderModuleHeader($targetUid);
+        $this->moduleTemplate->setContent($view->render());
         $response->getBody()->write($this->moduleTemplate->renderContent());
+
         return $response;
+
+
     }
 
     /**
@@ -109,60 +116,57 @@ class CreatePageFromTemplateController extends AbstractModule
     /**
      *
      */
-    protected function renderTemplateSelector()
+    protected function getTemplates()
     {
         $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
-
-        $pageIcon = $this->moduleTemplate
-            ->getIconFactory()
-            ->getIconForRecord('pages', [], Icon::SIZE_SMALL)
-            ->render();
-
-        $content = '<ul>';
-
+        $templateArray = [];
         foreach ($templates as $template) {
-            $content .= '<li>' . $pageIcon . htmlspecialchars($template['title']) . '<ul>';
-            $content .= '<li><a href="' . htmlspecialchars(
-                    GeneralUtility::linkThisScript(
+            $templateArray[$template['uid']] = [
+                'title' => htmlspecialchars($template['title']),
+                'links' => [
+                    'firstSubpage' => GeneralUtility::linkThisScript(
                         [
                             'templateUid' => $template['uid'],
                             'position' => 'firstSubpage'
                         ]
-                    )
-                ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_as_first_subpage') . '</a></li>';
-
-            $content .= '<li><a href="' . htmlspecialchars(
-                    GeneralUtility::linkThisScript(
+                    ),
+                    'lastSubpage' => GeneralUtility::linkThisScript(
                         [
                             'templateUid' => $template['uid'],
                             'position' => 'lastSubpage'
                         ]
-                    )
-                ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_as_last_subpage') . '</a></li>';
-
-            $content .= '<li><a href="' . htmlspecialchars(
-                    GeneralUtility::linkThisScript(
+                    ),
+                    'below' => GeneralUtility::linkThisScript(
                         [
                             'templateUid' => $template['uid'],
                             'position' => 'below'
                         ]
                     )
-                ) . '">' . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below_this_page') . '</a></li>';
-            $content .= '</ul></li>';
-
+                ]
+            ];
         }
-        $content .= '</ul>';
-        return '<div>' . $content . '</div>';
+        return $templateArray;
     }
 
     /**
-     * Return language service instance
+     * Returns a new standalone view, shorthand function
      *
-     * @return \TYPO3\CMS\Lang\LanguageService
+     * @param string $action Which templateFile should be used.
+     *
+     * @return StandaloneView
      */
-    protected function getLanguageService()
+    protected function getFluidTemplateObject(string $action): StandaloneView
     {
-        return $GLOBALS['LANG'];
+        /** @var StandaloneView $view */
+        $view = GeneralUtility::makeInstance(StandaloneView::class);
+        $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Layouts')]);
+        $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Partials/CreatePageFromTemplate')]);
+        $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Templates/CreatePageFromTemplate')]);
+
+        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Templates/CreatePageFromTemplate/' . $action . '.html'));
+
+        $view->getRequest()->setControllerExtensionName('Pagetemplates');
+        return $view;
     }
 
     /**
@@ -174,6 +178,4 @@ class CreatePageFromTemplateController extends AbstractModule
     {
         return $GLOBALS['BE_USER'];
     }
-
-
 }

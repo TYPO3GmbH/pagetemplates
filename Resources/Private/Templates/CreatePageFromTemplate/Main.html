@@ -1,0 +1,23 @@
+{namespace core=TYPO3\CMS\Core\ViewHelpers}
+<f:layout name="Main"/>
+<f:section name="content">
+    <h1>
+        <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template"/>
+    </h1>
+    <ul>
+        <f:for each="{templates}" as="template">
+            <li>{template.title}
+                <ul>
+                    <f:for each="{template.links}" as="link" key="linkName">
+                        <li>
+                            <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                            <a href="{link}">
+                                <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_{linkName}"/>
+                            </a>
+                        </li>
+                    </f:for>
+                </ul>
+            </li>
+        </f:for>
+    </ul>
+</f:section>

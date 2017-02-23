@@ -3,6 +3,19 @@ declare(strict_types = 1);
 
 namespace T3G\Pagetemplates\Service;
 
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -62,6 +75,33 @@ class CreatePageFromTemplateService
 
     /**
      * @param int $targetUid
+     * @param string $position
+     * @return int
+     */
+    protected function getManipulatedTargetUidForDataHandler(int $targetUid, string $position): int
+    {
+        switch ($position) {
+            case 'below';
+                $targetUid *= -1;
+                break;
+            case 'lastSubpage';
+                $uidOfLastSubpage = $this->getUidOfLastSubpage($targetUid);
+                // Only change the target uid, if the current page has at least one subpage.
+                if ($uidOfLastSubpage !== 0) {
+                    $targetUid = 0 - $uidOfLastSubpage;
+                }
+                break;
+            case 'firstSubpage';
+                // Nothing to change here, because this is default.
+                break;
+            default:
+                throw new \InvalidArgumentException('The given position didn\'t match the allowed.', 1487851947);
+        }
+        return $targetUid;
+    }
+
+    /**
+     * @param int $targetUid
      * @return int
      */
     protected function getUidOfLastSubpage(int $targetUid): int
@@ -86,32 +126,5 @@ class CreatePageFromTemplateService
             return (int)$templates['uid'];
         }
         return 0;
-    }
-
-    /**
-     * @param int $targetUid
-     * @param string $position
-     * @return int
-     */
-    protected function getManipulatedTargetUidForDataHandler(int $targetUid, string $position): int
-    {
-        switch ($position) {
-            case 'below';
-                $targetUid *= -1;
-                break;
-            case 'lastSubpage';
-                $uidOfLastSubpage = $this->getUidOfLastSubpage($targetUid);
-                // Only change the target uid, if the current page has at least one subpage.
-                if ($uidOfLastSubpage !== 0) {
-                    $targetUid = 0 - $uidOfLastSubpage;
-                }
-                break;
-            case 'firstSubpage';
-                // Nothing to change here, because this is default.
-                break;
-            default:
-                throw new \InvalidArgumentException('The given position didn\'t match the allowed.', 1487851947);
-        }
-        return $targetUid;
     }
 }

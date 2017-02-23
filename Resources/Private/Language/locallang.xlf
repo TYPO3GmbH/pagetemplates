@@ -52,13 +52,13 @@
             <trans-unit id="label.create_page_from_template">
                 <source>Create page from template</source>
             </trans-unit>
-            <trans-unit id="label.create_as_first_subpage">
+            <trans-unit id="label.create_firstSubpage">
                 <source>Create as first subpage</source>
             </trans-unit>
-            <trans-unit id="label.create_as_last_subpage">
+            <trans-unit id="label.create_lastSubpage">
                 <source>Create as last subpage</source>
             </trans-unit>
-            <trans-unit id="label.create_below_this_page">
+            <trans-unit id="label.create_below">
                 <source>Create below this page</source>
             </trans-unit>
         </body>
