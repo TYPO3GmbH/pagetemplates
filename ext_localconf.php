@@ -11,7 +11,12 @@ call_user_func(
             if ($extensionConfiguration['enableSimpleMode']) {
                 $GLOBALS['TYPO3_CONF_VARS']['BE']['ContextMenu']['ItemProviders'][1487761906] =
                     T3G\Pagetemplates\ContextMenu\CreatePageFromTemplateItemProvider::class;
+                \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('
+                    options.contextMenu.table.pages.tree.disableItems = new,newWizard
+                ');
             }
         }
     }
 );
+
+

@@ -21,6 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use T3G\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -45,12 +46,18 @@ class CreatePageFromTemplateController extends AbstractModule
     protected $createPageFromTemplateService;
 
     /**
+     * @var BackendUserAuthentication
+     */
+    protected $beUser;
+
+    /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
     public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
     {
+        $this->beUser = $this->getBackendUserAuthentication();
         $queryParams = $request->getQueryParams();
         $this->createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
 
@@ -60,7 +67,8 @@ class CreatePageFromTemplateController extends AbstractModule
 
         if ($queryParams['templateUid'] && $queryParams['templateUid'] !== 0) {
             $position = $queryParams['position'] ?: 'firstSubpage';
-            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'], (int)$queryParams['targetUid'],
+            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'],
+                (int)$queryParams['targetUid'],
                 $position);
             $urlParameters = [
                 'id' => $newPageUid,
@@ -92,12 +100,11 @@ class CreatePageFromTemplateController extends AbstractModule
      */
     protected function renderModuleHeader(int $targetUid)
     {
-        $beUser = $this->getBackendUserAuthentication();
         if ($targetUid > 0) {
-            $pageInfo = BackendUtility::readPageAccess($targetUid, $beUser->getPagePermsClause(1));
+            $pageInfo = BackendUtility::readPageAccess($targetUid, $this->beUser->getPagePermsClause(1));
         }
         // If there was a page - or if the user is admin (admins has access to the root) we proceed:
-        if (!empty($pageInfo['uid']) || $beUser->isAdmin()) {
+        if (!empty($pageInfo['uid']) || $this->beUser->isAdmin()) {
             if (empty($pageInfo)) {
                 // Explicitly pass an empty array to the docHeader
                 $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation([]);
@@ -114,13 +121,20 @@ class CreatePageFromTemplateController extends AbstractModule
         }
     }
 
+
     /**
-     *
+     * @return array
      */
-    protected function getTemplates()
+    protected function getTemplates(): array
     {
+        $allowedTemplatesForUser = [];
         $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
-        return $templates;
+        foreach ($templates as $template) {
+            if ($this->beUser->doesUserHaveAccess($template, 1)) {
+                $allowedTemplatesForUser[] = $template;
+            }
+        }
+        return $allowedTemplatesForUser;
     }
 
     /**
@@ -147,7 +161,7 @@ class CreatePageFromTemplateController extends AbstractModule
     /**
      * Returns the global BackendUserAuthentication object.
      *
-     * @return \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
+     * @return BackendUserAuthentication
      */
     protected function getBackendUserAuthentication()
     {
