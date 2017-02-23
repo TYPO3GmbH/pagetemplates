@@ -14,20 +14,16 @@
 /**
  * Module: TYPO3/CMS/Pagetemplates/ContextMenuActions
  *
- * JavaScript to handle "dereference" click in context menu of reference content elements in page module.
- * @exports T3G/Pagetemplates/ContextMenuActions
+ * JavaScript to handle "createPageFromTemplate" click in context menu of reference content elements in page module.
+ * @exports TYPO3/CMS/Pagetemplates/ContextMenuActions
  */
 define(function () {
     'use strict';
 
     /**
-     * @exports T3G/Pagetemplates/ContextMenuActions
+     * @exports TYPO3/CMS/Pagetemplates/ContextMenuActions
      */
     var ContextMenuActions = {};
-
-    ContextMenuActions.getReturnUrl = function () {
-        return top.rawurlencode(top.list_frame.document.location.pathname + top.list_frame.document.location.search);
-    };
 
     /**
      * Dereference an item from reference element
@@ -36,8 +32,9 @@ define(function () {
      * @param {int} uid of the element
      */
     ContextMenuActions.createPageFromTemplate = function (table, uid) {
+        var actionUrl = $(this).data('actionUrl');
         top.TYPO3.Backend.ContentContainer.setUrl(
-            top.TYPO3.settings.CreatePageFromTemplate.moduleUrl + '&targetUid=' + top.rawurlencode(uid) + '&returnUrl=' +  ContextMenuActions.getReturnUrl()
+            actionUrl + '&targetUid=' + top.rawurlencode(uid)
         );
 
     };

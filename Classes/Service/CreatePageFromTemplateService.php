@@ -3,13 +3,11 @@ declare(strict_types = 1);
 
 namespace T3G\Pagetemplates\Service;
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\HttpUtility;
 
 class CreatePageFromTemplateService
 {
@@ -19,7 +17,8 @@ class CreatePageFromTemplateService
      */
     public function getTemplatesFromDatabase(): array
     {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'], ['allowed_classes' => false]);
+        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'],
+            ['allowed_classes' => false]);
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()
@@ -28,8 +27,12 @@ class CreatePageFromTemplateService
         $templates = $queryBuilder->select('*')
             ->from('pages')
             ->where(
-                $queryBuilder->expr()->eq('pid', $extensionConfiguration['templateStorageFolder'])
+                $queryBuilder->expr()->eq(
+                    'pid',
+                    $queryBuilder->createNamedParameter($extensionConfiguration['templateStorageFolder'])
+                )
             )
+            ->orderBy('sorting')
             ->execute()
             ->fetchAll();
         return $templates;
@@ -39,8 +42,9 @@ class CreatePageFromTemplateService
      * @param int $templateUid
      * @param int $targetUid
      * @param string $position
+     * @return int
      */
-    public function createPageFromTemplate(int $templateUid, int $targetUid, string $position)
+    public function createPageFromTemplate(int $templateUid, int $targetUid, string $position): int
     {
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $data = [
@@ -53,15 +57,7 @@ class CreatePageFromTemplateService
         $dataHandler->start([], $data);
         $dataHandler->process_cmdmap();
 
-        $newPageUid = $dataHandler->copyMappingArray['pages'][$templateUid];
-
-        $urlParameters = [
-            'id' => $newPageUid,
-            'table' => 'pages'
-        ];
-        $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
-        @ob_end_clean();
-        HttpUtility::redirect($url);
+        return (int)$dataHandler->copyMappingArray['pages'][$templateUid];
     }
 
     /**
@@ -78,12 +74,18 @@ class CreatePageFromTemplateService
         $templates = $queryBuilder->select('*')
             ->from('pages')
             ->where(
-                $queryBuilder->expr()->eq('pid', $targetUid)
+                $queryBuilder->expr()->eq(
+                    'pid',
+                    $queryBuilder->createNamedParameter($targetUid)
+                )
             )
             ->orderBy('sorting', 'DESC')
             ->execute()
             ->fetch();
-        return (int)$templates['uid'];
+        if (!empty($templates)) {
+            return (int)$templates['uid'];
+        }
+        return 0;
     }
 
     /**
@@ -98,11 +100,17 @@ class CreatePageFromTemplateService
                 $targetUid *= -1;
                 break;
             case 'lastSubpage';
-                $targetUid = 0 - $this->getUidOfLastSubpage($targetUid);
+                $uidOfLastSubpage = $this->getUidOfLastSubpage($targetUid);
+                // Only change the target uid, if the current page has at least one subpage.
+                if ($uidOfLastSubpage !== 0) {
+                    $targetUid = 0 - $uidOfLastSubpage;
+                }
                 break;
             case 'firstSubpage';
-            default:
+                // Nothing to change here, because this is default.
                 break;
+            default:
+                throw new \InvalidArgumentException('The given position didn\'t match the allowed.', 1487851947);
         }
         return $targetUid;
     }

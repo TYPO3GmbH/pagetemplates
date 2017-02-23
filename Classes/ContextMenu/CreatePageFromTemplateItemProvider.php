@@ -17,6 +17,7 @@ namespace T3G\Pagetemplates\ContextMenu;
  */
 
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CreatePageFromTemplateItemProvider extends AbstractProvider
@@ -51,11 +52,7 @@ class CreatePageFromTemplateItemProvider extends AbstractProvider
      */
     public function canHandle(): bool
     {
-        $result = false;
-        if ($this->table === 'pages') {
-            $result = true;
-        }
-        return $result;
+        return $this->table === 'pages';
     }
 
     /**
@@ -80,8 +77,10 @@ class CreatePageFromTemplateItemProvider extends AbstractProvider
     protected function getAdditionalAttributes(string $itemName): array
     {
         $referenceElementUid = GeneralUtility::trimExplode('-', $this->context);
+        $url = BackendUtility::getModuleUrl('create-page-from-template');
         $result = [
             'data-callback-module' => 'TYPO3/CMS/Pagetemplates/ContextMenuAction',
+            'data-action-url' => htmlspecialchars($url),
             'data-reference-element-uid' => $referenceElementUid[1],
         ];
         return $result;

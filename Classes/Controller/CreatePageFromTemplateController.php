@@ -23,84 +23,22 @@ use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\HttpUtility;
 
+/**
+ * This controller is called via the click menu entry "Create page from template.
+ * To enable the entry in the menu, you need to enable the simple mode in the 
+ * extension manger and define the storage folder where you plan to store your
+ * templates.  
+ */
 class CreatePageFromTemplateController extends AbstractModule
 {
-    /**
-     * Accumulated HTML output
-     *
-     * @var string
-     */
-    protected $content = '';
-
-    /**
-     * @var int
-     */
-    protected $targetUid = 0;
-
-    /**
-     * @var int
-     */
-    protected $templateUid = 0;
-
-    /**
-     * @var string
-     */
-    protected $returnUrl = '';
-
-    /**
-     * @var string
-     */
-    protected $code = '';
-
-    /**
-     * @var array
-     */
-    protected $pageinfo = [];
 
     /**
      * @var CreatePageFromTemplateService
      */
-    protected $service;
+    protected $createPageFromTemplateService;
 
-    /**
-     * @var string
-     */
-    protected $position = 'firstSubpage';
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->service = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
-        $GLOBALS['SOBE'] = $this;
-        $this->getLanguageService()->includeLLFile('EXT:lang/Resources/Private/Language/locallang_misc.xlf');
-        $this->init();
-    }
-
-    protected function init()
-    {
-        $beUser = $this->getBackendUserAuthentication();
-
-        // Setting GPvars:
-        // The page id to operate from
-        $this->targetUid = (int)GeneralUtility::_GP('targetUid');
-        $this->templateUid = (int)GeneralUtility::_GP('templateUid');
-        $this->position = GeneralUtility::_GP('position');
-        $this->returnUrl = GeneralUtility::sanitizeLocalUrl(GeneralUtility::_GP('returnUrl'));
-
-        // Creating content
-        $this->content = '';
-        $this->content .= '<h1>'
-            . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template')
-            . '</h1>';
-        // If a positive id is supplied, ask for the page record with permission information contained:
-        if ($this->targetUid > 0) {
-            $this->pageinfo = BackendUtility::readPageAccess($this->targetUid, $beUser->getPagePermsClause(1));
-        }
-    }
 
     /**
      * @param ServerRequestInterface $request the current request
@@ -109,35 +47,58 @@ class CreatePageFromTemplateController extends AbstractModule
      */
     public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
     {
-        if ($this->templateUid !== 0) {
-            $this->service->createPageFromTemplate($this->templateUid, $this->targetUid, $this->position);
+        $this->createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
+        $targetUid = (int)GeneralUtility::_GP('targetUid');
+        $templateUid = (int)GeneralUtility::_GP('templateUid');
+
+        $templateSelectorHtml = '';
+
+        if ($templateUid !== 0) {
+            // If a templateUid is transmitted, it is to assume, that this page should be copied to the $targetUid.
+            $position = GeneralUtility::_GP('position') ?: 'firstSubpage';
+            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate($templateUid, $targetUid, $position);
+            $urlParameters = [
+                'id' => $newPageUid,
+                'table' => 'pages'
+            ];
+            $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
+            BackendUtility::setUpdateSignal('updatePageTree');
+            HttpUtility::redirect($url);
         } else {
-            $this->renderModuleHeader();
-            $this->renderTemplateSelector();
+            // Otherwise all templates should be listed.
+            $this->renderModuleHeader($targetUid);
+            $templateSelectorHtml = $this->renderTemplateSelector();
         }
-        $this->content .= '<div>' . $this->code . '</div>';
-        $this->moduleTemplate->setContent($this->content);
+        $content = '<h1>'
+            . $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template')
+            . '</h1>';
+        $content .= $templateSelectorHtml;
+        $this->moduleTemplate->setContent($content);
 
         $response->getBody()->write($this->moduleTemplate->renderContent());
         return $response;
     }
 
     /**
-     *
+     * @param int $targetUid
      */
-    protected function renderModuleHeader()
+    protected function renderModuleHeader(int $targetUid)
     {
+        $beUser = $this->getBackendUserAuthentication();
+        if ($targetUid > 0) {
+            $pageInfo = BackendUtility::readPageAccess($targetUid, $beUser->getPagePermsClause(1));
+        }
         // If there was a page - or if the user is admin (admins has access to the root) we proceed:
-        if (!empty($this->pageinfo['uid']) || $this->getBackendUserAuthentication()->isAdmin()) {
-            if (empty($this->pageinfo)) {
+        if (!empty($pageInfo['uid']) || $beUser->isAdmin()) {
+            if (empty($pageInfo)) {
                 // Explicitly pass an empty array to the docHeader
                 $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation([]);
             } else {
-                $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($this->pageinfo);
+                $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($pageInfo);
             }
             // Set header-HTML and return_url
-            if (is_array($this->pageinfo) && $this->pageinfo['uid']) {
-                $title = strip_tags($this->pageinfo[$GLOBALS['TCA']['pages']['ctrl']['label']]);
+            if (is_array($pageInfo) && $pageInfo['uid']) {
+                $title = strip_tags($pageInfo[$GLOBALS['TCA']['pages']['ctrl']['label']]);
             } else {
                 $title = $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'];
             }
@@ -150,7 +111,7 @@ class CreatePageFromTemplateController extends AbstractModule
      */
     protected function renderTemplateSelector()
     {
-        $templates = $this->service->getTemplatesFromDatabase();
+        $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
 
         $pageIcon = $this->moduleTemplate
             ->getIconFactory()
@@ -191,7 +152,7 @@ class CreatePageFromTemplateController extends AbstractModule
 
         }
         $content .= '</ul>';
-        $this->code .= '<div>' . $content . '</div>';
+        return '<div>' . $content . '</div>';
     }
 
     /**

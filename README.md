@@ -6,8 +6,8 @@ This extension provides the possibility to provide and easily use boilerplates f
 Simple mode
 -----------
 
-The simple mode must be enabled by the integrator within the extension manager. With this switch the Page Template 
-module will be disabled and a new optin in the click menu is enabled. 
+The simple mode is enabled by default and can be disabled by the integrator within the extension manager. 
+With this switch the Page Template module will be disabled and a new optin in the click menu is enabled. 
 Also she must provide the UID of the storage folder of the page template. 
 An editor now can create pages with content elements within this storage folder.
 
