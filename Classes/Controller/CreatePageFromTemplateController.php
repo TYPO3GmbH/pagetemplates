@@ -51,17 +51,16 @@ class CreatePageFromTemplateController extends AbstractModule
      */
     public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
     {
+        $queryParams = $request->getQueryParams();
         $this->createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
-        $targetUid = (int)GeneralUtility::_GP('targetUid');
-        $templateUid = (int)GeneralUtility::_GP('templateUid');
 
-        /**
-         * If a templateUid is transmitted, it is to assume, that this page should be copied to the $targetUid.
-         * Afterwards the user will be redirected to the page module of the newly created page
-         */
-        if ($templateUid !== 0) {
-            $position = GeneralUtility::_GP('position') ?: 'firstSubpage';
-            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate($templateUid, $targetUid,
+        // If a templateUid is transmitted, it is to assume, that this page should be copied to the
+        // $queryParams['targetUid'].
+        //Afterwards the user will be redirected to the page module of the newly created page
+
+        if ($queryParams['templateUid'] && $queryParams['templateUid'] !== 0) {
+            $position = $queryParams['position'] ?: 'firstSubpage';
+            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'], (int)$queryParams['targetUid'],
                 $position);
             $urlParameters = [
                 'id' => $newPageUid,
@@ -71,13 +70,15 @@ class CreatePageFromTemplateController extends AbstractModule
             BackendUtility::setUpdateSignal('updatePageTree');
             HttpUtility::redirect($url);
         }
-        /**
-         * Otherwise all templates should be listed.
-         */
+
+        // Otherwise all templates should be listed.
+
         $view = $this->getFluidTemplateObject('Main');
+
+        $view->assign('targetUid', (int)$queryParams['targetUid']);
         $view->assign('templates', $this->getTemplates());
 
-        $this->renderModuleHeader($targetUid);
+        $this->renderModuleHeader((int)$queryParams['targetUid']);
         $this->moduleTemplate->setContent($view->render());
         $response->getBody()->write($this->moduleTemplate->renderContent());
 
@@ -119,33 +120,7 @@ class CreatePageFromTemplateController extends AbstractModule
     protected function getTemplates()
     {
         $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
-        $templateArray = [];
-        foreach ($templates as $template) {
-            $templateArray[$template['uid']] = [
-                'title' => htmlspecialchars($template['title']),
-                'links' => [
-                    'firstSubpage' => GeneralUtility::linkThisScript(
-                        [
-                            'templateUid' => $template['uid'],
-                            'position' => 'firstSubpage'
-                        ]
-                    ),
-                    'lastSubpage' => GeneralUtility::linkThisScript(
-                        [
-                            'templateUid' => $template['uid'],
-                            'position' => 'lastSubpage'
-                        ]
-                    ),
-                    'below' => GeneralUtility::linkThisScript(
-                        [
-                            'templateUid' => $template['uid'],
-                            'position' => 'below'
-                        ]
-                    )
-                ]
-            ];
-        }
-        return $templateArray;
+        return $templates;
     }
 
     /**

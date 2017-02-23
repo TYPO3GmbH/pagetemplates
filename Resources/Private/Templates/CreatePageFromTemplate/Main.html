@@ -1,4 +1,5 @@
 {namespace core=TYPO3\CMS\Core\ViewHelpers}
+{namespace pt = T3G\Pagetemplates\ViewHelpers}
 <f:layout name="Main"/>
 <f:section name="content">
     <h1>
@@ -8,14 +9,24 @@
         <f:for each="{templates}" as="template">
             <li>{template.title}
                 <ul>
-                    <f:for each="{template.links}" as="link" key="linkName">
-                        <li>
-                            <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
-                            <a href="{link}">
-                                <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_{linkName}"/>
-                            </a>
-                        </li>
-                    </f:for>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=firstSubpage', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_firstSubpage"/>
+                        </a>
+                    </li>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=lastSubpage', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_lastSubpage"/>
+                        </a>
+                    </li>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=below', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below"/>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </f:for>
