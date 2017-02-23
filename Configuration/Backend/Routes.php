@@ -18,5 +18,9 @@ return [
     'create-page-from-template' => [
         'path' => '/context-menu/pagetemplates/create-page-from-template',
         'target' => \T3G\Pagetemplates\Controller\CreatePageFromTemplateController::class . '::mainAction'
+    ],
+    'db_new' => [
+        'path' => '/record/new',
+        'target' => \T3G\Pagetemplates\Controller\NewRecordController::class . '::mainAction'
     ]
 ];
