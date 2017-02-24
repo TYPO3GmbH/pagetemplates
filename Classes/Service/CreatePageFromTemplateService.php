@@ -42,7 +42,7 @@ class CreatePageFromTemplateService
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($extensionConfiguration['templateStorageFolder'])
+                    $queryBuilder->createNamedParameter($extensionConfiguration['templateStorageFolder'], \PDO::PARAM_INT)
                 )
             )
             ->orderBy('sorting')
@@ -116,7 +116,7 @@ class CreatePageFromTemplateService
             ->where(
                 $queryBuilder->expr()->eq(
                     'pid',
-                    $queryBuilder->createNamedParameter($targetUid)
+                    $queryBuilder->createNamedParameter($targetUid, \PDO::PARAM_INT)
                 )
             )
             ->orderBy('sorting', 'DESC')

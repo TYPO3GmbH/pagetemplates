@@ -22,12 +22,13 @@ use T3G\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
- * This controller is called via the click menu entry "Create page from template.
+ * This controller is called via the click menu entry "Create page from template."
  * To enable the entry in the menu, you need to enable the simple mode in the
  * extension manger and define the storage folder where you plan to store your
  * templates.
@@ -61,38 +62,45 @@ class CreatePageFromTemplateController extends AbstractModule
         $queryParams = $request->getQueryParams();
         $this->createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
 
-        // If a templateUid is transmitted, it is to assume, that this page should be copied to the
-        // $queryParams['targetUid'].
-        //Afterwards the user will be redirected to the page module of the newly created page
-
-        if ($queryParams['templateUid'] && $queryParams['templateUid'] !== 0) {
-            $position = $queryParams['position'] ?: 'firstSubpage';
-            $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'],
-                (int)$queryParams['targetUid'],
-                $position);
-            $urlParameters = [
-                'id' => $newPageUid,
-                'table' => 'pages'
-            ];
-            $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
-            BackendUtility::setUpdateSignal('updatePageTree');
-            HttpUtility::redirect($url);
+        if (isset($queryParams['templateUid']) && $queryParams['templateUid'] !== 0) {
+            $this->createPageFromTemplateAndRedirectToPageModule($queryParams);
+        } else {
+            return $this->showListOfTemplates($response, $queryParams);
         }
+    }
 
-        // Otherwise all templates should be listed.
+    /**
+     * @param $queryParams
+     */
+    protected function createPageFromTemplateAndRedirectToPageModule($queryParams)
+    {
+        $position = $queryParams['position'] ?: 'firstSubpage';
+        $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'],
+            (int)$queryParams['targetUid'],
+            $position);
+        $urlParameters = [
+            'id' => $newPageUid,
+            'table' => 'pages'
+        ];
+        $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
+        BackendUtility::setUpdateSignal('updatePageTree');
+        HttpUtility::redirect($url);
+    }
 
+    /**
+     * @param ResponseInterface $response
+     * @param $queryParams
+     * @return ResponseInterface
+     */
+    protected function showListOfTemplates(ResponseInterface $response, $queryParams)
+    {
         $view = $this->getFluidTemplateObject('Main');
-
         $view->assign('targetUid', (int)$queryParams['targetUid']);
         $view->assign('templates', $this->getTemplates());
-
         $this->renderModuleHeader((int)$queryParams['targetUid']);
         $this->moduleTemplate->setContent($view->render());
         $response->getBody()->write($this->moduleTemplate->renderContent());
-
         return $response;
-
-
     }
 
     /**
@@ -121,7 +129,6 @@ class CreatePageFromTemplateController extends AbstractModule
         }
     }
 
-
     /**
      * @return array
      */
@@ -130,7 +137,7 @@ class CreatePageFromTemplateController extends AbstractModule
         $allowedTemplatesForUser = [];
         $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
         foreach ($templates as $template) {
-            if ($this->beUser->doesUserHaveAccess($template, 1)) {
+            if ($this->beUser->doesUserHaveAccess($template, Permission::PAGE_SHOW)) {
                 $allowedTemplatesForUser[] = $template;
             }
         }
@@ -151,7 +158,6 @@ class CreatePageFromTemplateController extends AbstractModule
         $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Layouts')]);
         $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Partials/CreatePageFromTemplate')]);
         $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Templates/CreatePageFromTemplate')]);
-
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:pagetemplates/Resources/Private/Templates/CreatePageFromTemplate/' . $action . '.html'));
 
         $view->getRequest()->setControllerExtensionName('Pagetemplates');
@@ -167,4 +173,7 @@ class CreatePageFromTemplateController extends AbstractModule
     {
         return $GLOBALS['BE_USER'];
     }
+
+
+
 }
