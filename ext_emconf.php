@@ -1,23 +1,21 @@
 <?php
-/************************************************************************
- * Extension Manager/Repository config file for ext "hubspot".
- ************************************************************************/
-$EM_CONF[$_EXTKEY] = array(
+
+$EM_CONF[$_EXTKEY] = [
     'title' => 'Page Templates for TYPO3',
     'description' => 'Create new pages from Templates',
     'category' => 'extension',
-    'constraints' => array(
-        'depends' => array(
+    'constraints' => [
+        'depends' => [
             'typo3' => '8.6.0-8.99.99'
-        ),
-        'conflicts' => array(
-        ),
-    ),
-    'autoload' => array(
-        'psr-4' => array(
+        ],
+        'conflicts' => [
+        ],
+    ],
+    'autoload' => [
+        'psr-4' => [
             'T3G\\Pagetemplates\\' => 'Classes'
-        ),
-    ),
+        ],
+    ],
     'state' => 'alpha',
     'uploadfolder' => 0,
     'createDirs' => '',
@@ -26,4 +24,4 @@ $EM_CONF[$_EXTKEY] = array(
     'author_email' => 'susanne.moog@typo3.com',
     'author_company' => 'TYPO3 GmbH',
     'version' => '0.0.1',
-);
+];
