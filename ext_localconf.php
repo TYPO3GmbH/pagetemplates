@@ -13,6 +13,7 @@ call_user_func(
                     T3G\Pagetemplates\ContextMenu\CreatePageFromTemplateItemProvider::class;
                 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('
                     options.contextMenu.table.pages.tree.disableItems = new,newWizard
+                    options.contextMenu.table.pages.disableItems = new,newWizard
                 ');
             }
         }
