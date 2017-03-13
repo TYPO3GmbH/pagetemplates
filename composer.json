@@ -17,6 +17,10 @@
       "homepage": "https://typo3.com/"
     }
   ],
+  "support": {
+    "issues": "https://jira.typo3.com/servicedesk/customer/portal/3/group/41",
+    "source": "https://bitbucket.typo3.com/scm/ext/pagetemplates.git"
+  },
   "require": {
     "typo3/cms-core": "^8.6"
   },
