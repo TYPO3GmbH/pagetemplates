@@ -1,0 +1,27 @@
+page:
+    description: this is a superb description of the template
+    onCreateEditFields: title,description
+    defaults:
+        title: some title
+        description: and a description
+tt_content:
+    1:
+        description: This content element should be used for blobbber
+        onCreateEditFields: header
+        defaults:
+            header: a content element header
+            CType: div
+            colPos: 0
+    2:
+        description: a hidden element which will only be created
+        defaults:
+            header: some other content element
+            CType: div
+            colPos: 0
+    3:
+        description: and a third element
+        onCreateEditFields: header,subheader
+        defaults:
+            header: enter something sensible here, please
+            CType: textmedia
+            bodytext: some default bodytext stuff

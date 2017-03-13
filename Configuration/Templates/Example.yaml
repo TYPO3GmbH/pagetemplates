@@ -1,0 +1,8 @@
+example1:
+    name: "Example Template 1"
+    previewImage: "EXT:pagetemplates/ext_icon.svg"
+    description: "This is an example template for use in the templates extension."
+example2:
+    name: "Example Template 2"
+    previewImage: "EXT:pagetemplates/ext_icon.svg"
+    description: "This is an example template for use in the templates extension."

@@ -1,0 +1,34 @@
+{namespace core=TYPO3\CMS\Core\ViewHelpers}
+{namespace pt = T3G\AgencyPack\Pagetemplates\ViewHelpers}
+<f:layout name="Main"/>
+<f:section name="content">
+    <h1>
+        <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template"/>
+    </h1>
+    <ul class="list-tree">
+        <f:for each="{templates}" as="template">
+            <li>{template.title}
+                <ul>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=firstSubpage', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_firstSubpage"/>
+                        </a>
+                    </li>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=lastSubpage', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_lastSubpage"/>
+                        </a>
+                    </li>
+                    <li>
+                        <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
+                        <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=below', module:'create-page-from-template')}">
+                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below"/>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </f:for>
+    </ul>
+</f:section>
