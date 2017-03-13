@@ -11,6 +11,9 @@ With this switch the Page Template module will be disabled and a new option in t
 Also she must provide the UID of the storage folder of the page template. 
 An editor now can create pages with content elements within this storage folder.
 
+- Enable simple mode in Extension Manager > pagetemplates
+- Add storage PID of your template folder in Extension Manager
+
 
 YAML mode
 ---------
@@ -87,10 +90,15 @@ A single template configuration looks like this:
 
 Be aware that you can only configure tables that are stored directly on the page and have a pid field.
 
-## Usage
+## Usage in YAML mode
 
 - Click on the module in the main module menu
 - Choose a parent page
 - Choose a template
 - Fill template variables 
 - Click "Save new page"
+
+## Usage in Simple mode
+
+- Choose a page in page tree and open the context menu
+- Choose "Create page from template"
