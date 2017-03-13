@@ -13,7 +13,7 @@ $EM_CONF[$_EXTKEY] = [
     ],
     'autoload' => [
         'psr-4' => [
-            'T3G\\Pagetemplates\\' => 'Classes'
+            'T3G\\AgencyPack\\Pagetemplates\\' => 'Classes'
         ],
     ],
     'state' => 'alpha',

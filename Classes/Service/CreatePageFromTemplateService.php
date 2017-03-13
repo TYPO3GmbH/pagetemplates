@@ -1,7 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace T3G\Pagetemplates\Service;
+namespace T3G\AgencyPack\Pagetemplates\Service;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -30,8 +30,10 @@ class CreatePageFromTemplateService
      */
     public function getTemplatesFromDatabase(): array
     {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'],
-            ['allowed_classes' => false]);
+        $extensionConfiguration = unserialize(
+            $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'],
+            ['allowed_classes' => false]
+        );
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()

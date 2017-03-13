@@ -1,5 +1,7 @@
 <?php
-namespace T3G\Pagetemplates\ViewHelpers;
+
+namespace T3G\AgencyPack\Pagetemplates\ViewHelpers;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *

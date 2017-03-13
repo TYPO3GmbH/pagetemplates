@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Pagetemplates\Controller;
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -18,7 +18,7 @@ namespace T3G\Pagetemplates\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use T3G\Pagetemplates\Service\CreatePageFromTemplateService;
+use T3G\AgencyPack\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Module\AbstractModule;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;

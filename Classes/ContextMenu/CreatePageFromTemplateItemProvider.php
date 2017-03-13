@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\Pagetemplates\ContextMenu;
+namespace T3G\AgencyPack\Pagetemplates\ContextMenu;
 
 /*
  * This file is part of the TYPO3 CMS project.

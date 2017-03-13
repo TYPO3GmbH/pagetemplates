@@ -18,15 +18,16 @@
     }
   ],
   "require": {
+    "typo3/cms-core": "^8.6"
   },
- "autoload": {
+  "autoload": {
     "psr-4": {
-      "T3G\\Pagetemplates\\": "Classes/"
+      "T3G\\AgencyPack\\Pagetemplates\\": "Classes/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "T3G\\Pagetemplates\\Tests\\": "Tests/"
+      "T3G\\AgencyPack\\Pagetemplates\\Tests\\": "Tests/"
     }
   },
   "require-dev": {

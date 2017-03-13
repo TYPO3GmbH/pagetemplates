@@ -1,11 +1,22 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
-namespace T3G\Pagetemplates\Controller;
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
-
-use T3G\Pagetemplates\View\BackendTemplateView;
+use T3G\AgencyPack\Pagetemplates\View\BackendTemplateView;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
 use TYPO3\CMS\Backend\Template\Components\MenuRegistry;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
@@ -18,26 +29,32 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 class AbstractController extends ActionController
 {
     const MODULE_NAME = 'web_PagetemplatesTxPagetemplates';
+
     /**
      * @var ButtonBar
      */
     protected $buttonBar;
+
     /**
      * @var MenuRegistry
      */
     protected $menuRegistry;
+
     /**
      * @var BackendTemplateView
      */
     protected $defaultViewObjectName = BackendTemplateView::class;
+
     /**
      * @var PageRenderer
      */
     protected $pageRenderer;
+
     /**
      * @var FlashMessageService
      */
     protected $flashMessageService;
+
     /**
      * @var ModuleTemplate
      */

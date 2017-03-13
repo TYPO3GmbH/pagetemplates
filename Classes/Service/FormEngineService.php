@@ -1,7 +1,20 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace T3G\Pagetemplates\Service;
+namespace T3G\AgencyPack\Pagetemplates\Service;
+
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
@@ -24,7 +37,7 @@ class FormEngineService
      * @param array $configuration
      * @return array
      */
-    public function createEditForm(array $configuration) : array
+    public function createEditForm(array $configuration): array
     {
         $formResultCompiler = GeneralUtility::makeInstance(FormResultCompiler::class);
         $form = $this->getForm($configuration['page'], 'pages', (int)$_GET['id']);
@@ -53,7 +66,7 @@ class FormEngineService
      * @param array $configuration
      * @return string
      */
-    protected function getIdentifierField(array &$configuration) : string
+    protected function getIdentifierField(array &$configuration): string
     {
         $identifier = $configuration['__identifier'];
         unset($configuration['__identifier']);
@@ -70,7 +83,7 @@ class FormEngineService
      * @param string $newUid
      * @return string
      */
-    protected function getHiddenFields(string $table, array $defaults, string $newUid) : string
+    protected function getHiddenFields(string $table, array $defaults, string $newUid): string
     {
         $additionalFields = '';
         foreach ($defaults as $field => $default) {
@@ -89,7 +102,7 @@ class FormEngineService
      * @param int $parent
      * @return array
      */
-    protected function getForm(array $configuration, string $table, int $parent) : array
+    protected function getForm(array $configuration, string $table, int $parent): array
     {
         $result['formResult'] = null;
         $result['description'] = '';
@@ -138,7 +151,7 @@ class FormEngineService
      * @param array $defaults
      * @return array
      */
-    protected function prepareFieldsNotYetRendered(array $fieldsRendered, array $defaults) : array
+    protected function prepareFieldsNotYetRendered(array $fieldsRendered, array $defaults): array
     {
         foreach ($fieldsRendered as $fieldAlreadyRendered) {
             if (array_key_exists(trim($fieldAlreadyRendered), $defaults)) {

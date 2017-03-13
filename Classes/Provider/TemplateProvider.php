@@ -1,7 +1,20 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace T3G\Pagetemplates\Provider;
+namespace T3G\AgencyPack\Pagetemplates\Provider;
+
+/*
+ * This file is part of the TYPO3 CMS project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 2
+ * of the License, or any later version.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -30,7 +43,7 @@ class TemplateProvider
      * @param string $templateIdentifier
      * @return array
      */
-    public function getTemplateConfiguration(string $templateIdentifier) : array
+    public function getTemplateConfiguration(string $templateIdentifier): array
     {
         $templatePath = $this->configurationPath . '/Structure/' . $templateIdentifier . '.yaml';
         if (file_exists($templatePath)) {
@@ -48,7 +61,7 @@ class TemplateProvider
      *
      * @return array
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         $files = $this->getYamlFilesInFolder($this->configurationPath);
         $templates = [];
@@ -65,7 +78,7 @@ class TemplateProvider
      * @param string $path
      * @return array
      */
-    protected function getYamlFilesInFolder(string $path) : array
+    protected function getYamlFilesInFolder(string $path): array
     {
         $path = rtrim($path, '/');
         $files = [];
