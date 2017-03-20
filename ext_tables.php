@@ -10,7 +10,7 @@ call_user_func(
             $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates']);
             if (!$extensionConfiguration['enableSimpleMode']) {
                 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-                    'T3G.Pagetemplates',
+                    'T3G.AgencyPack.Pagetemplates',
                     'web',
                     'tx_Pagetemplates',
                     '',
