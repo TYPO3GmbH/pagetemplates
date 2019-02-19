@@ -1,9 +1,14 @@
-{namespace core=TYPO3\CMS\Core\ViewHelpers}
-{namespace pt = T3G\AgencyPack\Pagetemplates\ViewHelpers}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"
+      xmlns:f="http://typo3.org/ns/typo3/cms-fluid/master/ViewHelpers"
+      xmlns:pt="http://typo3.org/ns/T3G/AgencyPack/Pagetemplates/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      data-namespace-typo3-fluid="true"
+>
 <f:layout name="Main"/>
 <f:section name="content">
     <h1>
-        <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template"/>
+        <f:translate
+                key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_page_from_template"/>
     </h1>
     <ul class="list-tree">
         <f:for each="{templates}" as="template">
@@ -12,19 +17,22 @@
                     <li>
                         <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
                         <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=firstSubpage', module:'create-page-from-template')}">
-                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_firstSubpage"/>
+                            <f:translate
+                                    key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_firstSubpage"/>
                         </a>
                     </li>
                     <li>
                         <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
                         <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=lastSubpage', module:'create-page-from-template')}">
-                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_lastSubpage"/>
+                            <f:translate
+                                    key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_lastSubpage"/>
                         </a>
                     </li>
                     <li>
                         <core:icon identifier="apps-pagetree-page" alternativeMarkupIdentifier="inline" size="small"/>
                         <a href="{pt:goToModule(parameters:'targetUid={targetUid}&templateUid={template.uid}&position=below', module:'create-page-from-template')}">
-                            <f:translate key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below"/>
+                            <f:translate
+                                    key="LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_below"/>
                         </a>
                     </li>
                 </ul>
@@ -32,3 +40,4 @@
         </f:for>
     </ul>
 </f:section>
+</html>

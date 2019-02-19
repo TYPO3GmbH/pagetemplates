@@ -18,12 +18,11 @@ namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 use T3G\AgencyPack\Pagetemplates\Provider\TemplateProvider;
 use T3G\AgencyPack\Pagetemplates\Service\FormEngineService;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
-use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class WizardController extends AbstractController
@@ -48,7 +47,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_found.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -63,7 +62,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('config_dir_not_set.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_set.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -78,7 +77,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('no_page_selected.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('no_page_selected.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -96,7 +95,10 @@ class WizardController extends AbstractController
 
         $id = (int)$_GET['id'];
         $pagesTSconfig = BackendUtility::getPagesTSconfig($id);
-        $this->configPath = rtrim(GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']), '/');
+        $this->configPath = rtrim(
+            GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']),
+            '/'
+        );
 
         if ($id === 0) {
             $this->addSelectPageInfo();
@@ -134,8 +136,8 @@ class WizardController extends AbstractController
                 $headline = LocalizationUtility::translate('exception.1483357769811.headline', 'pagetemplates');
                 $message = sprintf(
                     LocalizationUtility::translate('exception.1483357769811.message', 'pagetemplates'),
-                    htmlspecialchars($templateIdentifier),
-                    htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+                    htmlspecialchars($templateIdentifier, ENT_QUOTES | ENT_HTML5),
+                    htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
                 );
                 $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
                 $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -165,7 +167,10 @@ class WizardController extends AbstractController
         BackendUtility::setUpdateSignal('updatePageTree');
         $realPid = $tce->substNEWwithIDs[$newPageIdentifier];
 
-        $pageModuleUrl = BackendUtility::getModuleUrl('web_layout', ['id' => $realPid]);
+        $pageModuleUrl = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute(
+            'web_layout',
+            ['id' => $realPid]
+        );
 
         $this->redirectToUri($pageModuleUrl);
     }

@@ -19,9 +19,11 @@ namespace T3G\AgencyPack\Pagetemplates\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use T3G\AgencyPack\Pagetemplates\Service\CreatePageFromTemplateService;
-use TYPO3\CMS\Backend\Module\AbstractModule;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
@@ -33,7 +35,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * extension manger and define the storage folder where you plan to store your
  * templates.
  */
-class CreatePageFromTemplateController extends AbstractModule
+class CreatePageFromTemplateController
 {
 
     /**
@@ -50,22 +52,30 @@ class CreatePageFromTemplateController extends AbstractModule
      * @var BackendUserAuthentication
      */
     protected $beUser;
+    /**
+     * @var object|\TYPO3\CMS\Backend\Template\ModuleTemplate
+     */
+    protected $moduleTemplate;
+
+    public function __construct()
+    {
+        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+    }
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException
      */
-    public function mainAction(ServerRequestInterface $request, ResponseInterface $response)
+    public function mainAction(ServerRequestInterface $request): ?ResponseInterface
     {
         $this->beUser = $this->getBackendUserAuthentication();
         $queryParams = $request->getQueryParams();
         $this->createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
-
         if (isset($queryParams['templateUid']) && $queryParams['templateUid'] !== 0) {
             $this->createPageFromTemplateAndRedirectToPageModule($queryParams);
         } else {
-            return $this->showListOfTemplates($response, $queryParams);
+            return $this->showListOfTemplates($queryParams);
         }
     }
 
@@ -82,31 +92,30 @@ class CreatePageFromTemplateController extends AbstractModule
             'id' => $newPageUid,
             'table' => 'pages'
         ];
-        $url = BackendUtility::getModuleUrl('web_layout', $urlParameters);
+        $url = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute('web_layout', $urlParameters);
         BackendUtility::setUpdateSignal('updatePageTree');
         HttpUtility::redirect($url);
     }
 
     /**
-     * @param ResponseInterface $response
      * @param $queryParams
      * @return ResponseInterface
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException
      */
-    protected function showListOfTemplates(ResponseInterface $response, $queryParams)
+    protected function showListOfTemplates($queryParams): ResponseInterface
     {
         $view = $this->getFluidTemplateObject('Main');
         $view->assign('targetUid', (int)$queryParams['targetUid']);
         $view->assign('templates', $this->getTemplates());
         $this->renderModuleHeader((int)$queryParams['targetUid']);
         $this->moduleTemplate->setContent($view->render());
-        $response->getBody()->write($this->moduleTemplate->renderContent());
-        return $response;
+        return GeneralUtility::makeInstance(HtmlResponse::class, $this->moduleTemplate->renderContent());
     }
 
     /**
      * @param int $targetUid
      */
-    protected function renderModuleHeader(int $targetUid)
+    protected function renderModuleHeader(int $targetUid): void
     {
         if ($targetUid > 0) {
             $pageInfo = BackendUtility::readPageAccess($targetUid, $this->beUser->getPagePermsClause(1));
@@ -147,8 +156,8 @@ class CreatePageFromTemplateController extends AbstractModule
      * Returns a new standalone view, shorthand function
      *
      * @param string $action Which templateFile should be used.
-     *
      * @return StandaloneView
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException
      */
     protected function getFluidTemplateObject(string $action): StandaloneView
     {
@@ -168,7 +177,7 @@ class CreatePageFromTemplateController extends AbstractModule
      *
      * @return BackendUserAuthentication
      */
-    protected function getBackendUserAuthentication()
+    protected function getBackendUserAuthentication(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'];
     }

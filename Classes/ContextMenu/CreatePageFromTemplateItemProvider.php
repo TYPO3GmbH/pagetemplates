@@ -17,7 +17,7 @@ namespace T3G\AgencyPack\Pagetemplates\ContextMenu;
  */
 
 use TYPO3\CMS\Backend\ContextMenu\ItemProviders\AbstractProvider;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CreatePageFromTemplateItemProvider extends AbstractProvider
@@ -73,14 +73,16 @@ class CreatePageFromTemplateItemProvider extends AbstractProvider
      *
      * @param string $itemName
      * @return array
+     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     protected function getAdditionalAttributes(string $itemName): array
     {
         $referenceElementUid = GeneralUtility::trimExplode('-', $this->context);
-        $url = BackendUtility::getModuleUrl('create-page-from-template');
+
+        $url = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute('create-page-from-template');
         $result = [
             'data-callback-module' => 'TYPO3/CMS/Pagetemplates/ContextMenuAction',
-            'data-action-url' => htmlspecialchars($url),
+            'data-action-url' => htmlspecialchars($url, ENT_QUOTES | ENT_HTML5),
             'data-reference-element-uid' => $referenceElementUid[1],
         ];
         return $result;

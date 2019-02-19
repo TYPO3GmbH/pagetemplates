@@ -51,7 +51,10 @@ class TemplateProvider
             $configuration = Yaml::parse($content);
             $configuration['__identifier'] = $templateIdentifier;
         } else {
-            throw new \InvalidArgumentException('Template not found:' . htmlspecialchars($templatePath), 1483357769811);
+            throw new \InvalidArgumentException(
+                'Template not found:' . htmlspecialchars($templatePath, ENT_QUOTES | ENT_HTML5),
+                1483357769811
+            );
         }
         return $configuration;
     }
@@ -65,11 +68,13 @@ class TemplateProvider
     {
         $files = $this->getYamlFilesInFolder($this->configurationPath);
         $templates = [];
-        foreach ($files as $file) {
-            $content = file_get_contents($file);
-            $templates[] = Yaml::parse($content);
+        if (count($files) > 0) {
+            foreach ($files as $file) {
+                $content = file_get_contents($file);
+                $templates[] = Yaml::parse($content);
+            }
+            $templates = array_merge(...$templates);
         }
-        $templates = array_merge(...$templates);
         return $templates;
     }
 

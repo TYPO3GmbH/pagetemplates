@@ -22,7 +22,9 @@
         "source": "https://bitbucket.typo3.com/scm/ext/pagetemplates.git"
     },
     "require": {
-        "typo3/cms-core": "^8.6",
+        "typo3/cms-core": "^9.5",
+        "typo3/cms-backend": "^9.5",
+        "typo3/cms-extbase": "^9.5",
         "symfony/yaml": "~3.4|~4.0",
         "typo3fluid/fluid": "^2.3"
     },

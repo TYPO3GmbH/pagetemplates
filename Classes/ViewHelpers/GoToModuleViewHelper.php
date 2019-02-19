@@ -15,9 +15,9 @@ namespace T3G\AgencyPack\Pagetemplates\ViewHelpers;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 
 /**
@@ -37,26 +37,15 @@ class GoToModuleViewHelper extends AbstractViewHelper
     }
 
     /**
-     * Returns an URL to link to a module.
-     *
-     * @return string URL to FormEngine module + parameters
-     * @see \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl()
-     */
-    public function render()
-    {
-        return static::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
-
-    /**
      * @param array $arguments
      * @param \Closure $renderChildrenClosure
      * @param RenderingContextInterface $renderingContext
-     *
      * @return string
+     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
         $parameters = GeneralUtility::explodeUrl2Array($arguments['parameters']);
-        return BackendUtility::getModuleUrl($arguments['module'], $parameters);
+        return (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute($arguments['module'], $parameters);
     }
 }
