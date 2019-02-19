@@ -30,8 +30,7 @@ class PageRepository
      */
     public function getPagesBasedOnTemplates(): array
     {
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $queryBuilder = $connectionPool->getQueryBuilderForTable('pages');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()->removeAll()->add(new DeletedRestriction());
         return $queryBuilder->select('uid', 'title', 'hidden', 'starttime', 'endtime', 'tx_pagetemplates_basetemplate')
             ->from('pages')

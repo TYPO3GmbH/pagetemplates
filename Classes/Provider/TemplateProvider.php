@@ -67,8 +67,9 @@ class TemplateProvider
         $templates = [];
         foreach ($files as $file) {
             $content = file_get_contents($file);
-            $templates = array_merge($templates, Yaml::parse($content));
+            $templates[] = Yaml::parse($content);
         }
+        $templates = array_merge(...$templates);
         return $templates;
     }
 

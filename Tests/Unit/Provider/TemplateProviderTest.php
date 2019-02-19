@@ -26,11 +26,10 @@ class TemplateProviderTest extends TestCase
      * @test
      * @return void
      */
-    public function getTemplatesReturnsTemplateArray()
+    public function getTemplatesReturnsTemplateArray(): void
     {
         $examplePath = __DIR__ . '/../../../Configuration/Templates';
-        $templateProvider = new TemplateProvider($examplePath);
-        $templates = $templateProvider->getTemplates();
+        $templates = (new TemplateProvider($examplePath))->getTemplates();
         $expected = [
             'example1' =>
                 [

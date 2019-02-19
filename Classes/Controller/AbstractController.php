@@ -28,7 +28,7 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 class AbstractController extends ActionController
 {
-    const MODULE_NAME = 'web_PagetemplatesTxPagetemplates';
+    protected const MODULE_NAME = 'web_PagetemplatesTxPagetemplates';
 
     /**
      * @var ButtonBar

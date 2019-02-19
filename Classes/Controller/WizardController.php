@@ -22,6 +22,8 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
+use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 class WizardController extends AbstractController
@@ -41,7 +43,7 @@ class WizardController extends AbstractController
     /**
      * Add flash message if the config directory cannot be found.
      */
-    protected function addNoConfigFoundError()
+    protected function addNoConfigFoundError(): void
     {
         $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
         $message = sprintf(
@@ -103,13 +105,14 @@ class WizardController extends AbstractController
         } elseif (!is_dir($this->configPath)) {
             $this->addNoConfigFoundError();
         }
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         $this->templateProvider = $this->objectManager->get(TemplateProvider::class, $this->configPath);
     }
 
     /**
      * Display available templates.
      */
-    public function indexAction()
+    public function indexAction(): void
     {
         $templates = $this->templateProvider->getTemplates();
         $this->view->assign('templates', $templates);
@@ -120,12 +123,11 @@ class WizardController extends AbstractController
      *
      * @param string $templateIdentifier
      */
-    public function createAction(string $templateIdentifier)
+    public function createAction(string $templateIdentifier): void
     {
         try {
             $configuration = $this->templateProvider->getTemplateConfiguration($templateIdentifier);
-            $formEngineService = $this->objectManager->get(FormEngineService::class);
-            $forms = $formEngineService->createEditForm($configuration);
+            $forms = $this->objectManager->get(FormEngineService::class)->createEditForm($configuration);
             $this->view->assign('forms', $forms);
         } catch (\InvalidArgumentException $e) {
             if ($e->getCode() === 1483357769811) {
@@ -148,7 +150,7 @@ class WizardController extends AbstractController
      * save template as new page
      * and send the user to the page module.
      */
-    public function saveNewPageAction()
+    public function saveNewPageAction(): void
     {
         $tce = GeneralUtility::makeInstance(DataHandler::class);
         $data = $_POST['data'];
@@ -156,6 +158,7 @@ class WizardController extends AbstractController
         foreach ($data as $table => &$elements) {
             arsort($elements);
         }
+        unset($elements);
         $newPageIdentifier = key($data['pages']);
         $tce->start($data, []);
         $tce->process_datamap();
@@ -163,6 +166,7 @@ class WizardController extends AbstractController
         $realPid = $tce->substNEWwithIDs[$newPageIdentifier];
 
         $pageModuleUrl = BackendUtility::getModuleUrl('web_layout', ['id' => $realPid]);
+
         $this->redirectToUri($pageModuleUrl);
     }
 

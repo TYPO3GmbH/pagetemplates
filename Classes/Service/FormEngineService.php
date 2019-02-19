@@ -101,6 +101,7 @@ class FormEngineService
      * @param string $table
      * @param int $parent
      * @return array
+     * @throws \TYPO3\CMS\Backend\Form\Exception
      */
     protected function getForm(array $configuration, string $table, int $parent): array
     {

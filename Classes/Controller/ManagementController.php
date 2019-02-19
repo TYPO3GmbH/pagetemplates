@@ -30,7 +30,7 @@ class ManagementController extends AbstractController
      *
      * @param PageRepository $pageRepository
      */
-    public function injectPageRepository(PageRepository $pageRepository)
+    public function injectPageRepository(PageRepository $pageRepository): void
     {
         $this->pageRepository = $pageRepository;
     }
@@ -38,7 +38,7 @@ class ManagementController extends AbstractController
     /**
      * Action to display pages based on templates
      */
-    public function basedOnAction()
+    public function basedOnAction(): void
     {
         $pagesBasedOnTemplates = $this->pageRepository->getPagesBasedOnTemplates();
         $this->view

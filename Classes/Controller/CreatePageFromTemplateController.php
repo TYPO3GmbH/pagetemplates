@@ -72,7 +72,7 @@ class CreatePageFromTemplateController extends AbstractModule
     /**
      * @param $queryParams
      */
-    protected function createPageFromTemplateAndRedirectToPageModule($queryParams)
+    protected function createPageFromTemplateAndRedirectToPageModule($queryParams): void
     {
         $position = $queryParams['position'] ?: 'firstSubpage';
         $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'],
@@ -135,8 +135,7 @@ class CreatePageFromTemplateController extends AbstractModule
     protected function getTemplates(): array
     {
         $allowedTemplatesForUser = [];
-        $templates = $this->createPageFromTemplateService->getTemplatesFromDatabase();
-        foreach ($templates as $template) {
+        foreach ($this->createPageFromTemplateService->getTemplatesFromDatabase() as $template) {
             if ($this->beUser->doesUserHaveAccess($template, Permission::PAGE_SHOW)) {
                 $allowedTemplatesForUser[] = $template;
             }

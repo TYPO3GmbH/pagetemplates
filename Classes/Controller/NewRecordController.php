@@ -69,13 +69,14 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
         $rowContent = '';
         // New pages INSIDE this pages
         $newPageLinks = [];
+        $backendUserAuthentication = $this->getBackendUserAuthentication();
         if ($displayNewPagesIntoLink && $this->isTableAllowedForThisPage(
                 $this->pageinfo,
                 'pages'
-            ) && $this->getBackendUserAuthentication()->check(
+            ) && $backendUserAuthentication->check(
                 'tables_modify',
                 'pages'
-            ) && $this->getBackendUserAuthentication()->workspaceCreateNewRecord(
+            ) && $backendUserAuthentication->workspaceCreateNewRecord(
                 ($this->pageinfo['_ORIG_uid'] ?: $this->id),
                 'pages'
             )
@@ -97,10 +98,10 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
         if ($displayNewPagesAfterLink && $this->isTableAllowedForThisPage(
                 $this->pidInfo,
                 'pages'
-            ) && $this->getBackendUserAuthentication()->check(
+            ) && $backendUserAuthentication->check(
                 'tables_modify',
                 'pages'
-            ) && $this->getBackendUserAuthentication()->workspaceCreateNewRecord(
+            ) && $backendUserAuthentication->workspaceCreateNewRecord(
                 $this->pidInfo['uid'],
                 'pages'
             )
@@ -116,9 +117,8 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
             $newPageLinks[] = '<a href="' . htmlspecialchars(GeneralUtility::linkThisScript(['pagesOnly' => 1])) . '">' . $pageIcon . htmlspecialchars($lang->getLL('pageSelectPosition')) . '</a>';
         }
         // Assemble all new page links
-        $numPageLinks = count($newPageLinks);
-        for ($i = 0; $i < $numPageLinks; $i++) {
-            $rowContent .= '<li>' . $newPageLinks[$i] . '</li>';
+        foreach ($newPageLinks as $iValue) {
+            $rowContent .= '<li>' . $iValue . '</li>';
         }
         if ($this->showNewRecLink('pages')) {
             $rowContent = '<li>' . $newPageIcon . '<strong>' .
@@ -139,7 +139,7 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
 
         $iconFile = [];
         // New tables (but not pages) INSIDE this pages
-        $isAdmin = $this->getBackendUserAuthentication()->isAdmin();
+        $isAdmin = $backendUserAuthentication->isAdmin();
         $newContentIcon = $this->moduleTemplate->getIconFactory()->getIcon(
             'actions-document-new',
             Icon::SIZE_SMALL
@@ -152,9 +152,9 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                     if ($table !== 'pages'
                         && $this->showNewRecLink($table)
                         && $this->isTableAllowedForThisPage($this->pageinfo, $table)
-                        && $this->getBackendUserAuthentication()->check('tables_modify', $table)
+                        && $backendUserAuthentication->check('tables_modify', $table)
                         && ($rootLevelConfiguration === -1 || ($this->id xor $rootLevelConfiguration))
-                        && $this->getBackendUserAuthentication()->workspaceCreateNewRecord(
+                        && $backendUserAuthentication->workspaceCreateNewRecord(
                             ($this->pageinfo['_ORIG_uid'] ? $this->pageinfo['_ORIG_uid'] : $this->id),
                             $table
                         )
@@ -333,8 +333,7 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
     {
         $allowedTemplatesForUser = [];
         $createPageFromTemplateService = GeneralUtility::makeInstance(CreatePageFromTemplateService::class);
-        $templates = $createPageFromTemplateService->getTemplatesFromDatabase();
-        foreach ($templates as $template) {
+        foreach ($createPageFromTemplateService->getTemplatesFromDatabase() as $template) {
             if ($this->getBackendUserAuthentication()->doesUserHaveAccess($template, 1)) {
                 $allowedTemplatesForUser[] = $template;
             }
