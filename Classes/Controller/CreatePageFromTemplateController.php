@@ -1,20 +1,14 @@
 <?php
 declare(strict_types = 1);
 
-namespace T3G\AgencyPack\Pagetemplates\Controller;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
+
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -85,9 +79,11 @@ class CreatePageFromTemplateController
     protected function createPageFromTemplateAndRedirectToPageModule($queryParams): void
     {
         $position = $queryParams['position'] ?: 'firstSubpage';
-        $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate((int)$queryParams['templateUid'],
+        $newPageUid = $this->createPageFromTemplateService->createPageFromTemplate(
+            (int)$queryParams['templateUid'],
             (int)$queryParams['targetUid'],
-            $position);
+            $position
+        );
         $urlParameters = [
             'id' => $newPageUid,
             'table' => 'pages'
@@ -181,7 +177,4 @@ class CreatePageFromTemplateController
     {
         return $GLOBALS['BE_USER'];
     }
-
-
-
 }

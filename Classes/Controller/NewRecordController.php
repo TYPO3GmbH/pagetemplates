@@ -1,22 +1,15 @@
 <?php
-declare (strict_types=1);
+declare(strict_types=1);
+
+/*
+ * This file is part of the package t3g/pagetemplates.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
 
 namespace T3G\AgencyPack\Pagetemplates\Controller;
 
-/*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
- */
-
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use T3G\AgencyPack\Pagetemplates\Service\CreatePageFromTemplateService;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
@@ -32,7 +25,6 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  *
  * Class NewRecordController
  *
- * @package T3G\AgencyPack\Pagetemplates\Controller
  */
 class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordController
 {
@@ -75,20 +67,21 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
         $newPageLinks = [];
         $backendUserAuthentication = $this->getBackendUserAuthentication();
         if ($displayNewPagesIntoLink && $this->isTableAllowedOnPage(
-                'pages',
-                $this->pageinfo
-            ) && $backendUserAuthentication->check(
-                'tables_modify',
-                'pages'
-            ) && $backendUserAuthentication->workspaceCreateNewRecord(
-                ($this->pageinfo['_ORIG_uid'] ?: $this->id),
-                'pages'
-            )
+            'pages',
+            $this->pageinfo
+        ) && $backendUserAuthentication->check(
+            'tables_modify',
+            'pages'
+        ) && $backendUserAuthentication->workspaceCreateNewRecord(
+            ($this->pageinfo['_ORIG_uid'] ?: $this->id),
+            'pages'
+        )
         ) {
             // Create link to new page inside:
             $newPageLinks[] = $this->renderLink(
                 $this->moduleTemplate->getIconFactory()->getIconForRecord(
-                    $table, [],
+                    $table,
+                    [],
                     Icon::SIZE_SMALL
                 )->render() .
                 htmlspecialchars($lang->sL($v['ctrl']['title']), ENT_QUOTES | ENT_HTML5) .
@@ -98,20 +91,21 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                     ENT_QUOTES | ENT_HTML5
                 ) .
                 ')',
-                $table, $this->id
+                $table,
+                $this->id
             );
         }
         // New pages AFTER this pages
         if ($displayNewPagesAfterLink && $this->isTableAllowedOnPage(
-                'pages',
-                $this->pidInfo
-            ) && $backendUserAuthentication->check(
-                'tables_modify',
-                'pages'
-            ) && $backendUserAuthentication->workspaceCreateNewRecord(
-                $this->pidInfo['uid'],
-                'pages'
-            )
+            'pages',
+            $this->pidInfo
+        ) && $backendUserAuthentication->check(
+            'tables_modify',
+            'pages'
+        ) && $backendUserAuthentication->workspaceCreateNewRecord(
+            $this->pidInfo['uid'],
+            'pages'
+        )
         ) {
             $newPageLinks[] = $this->renderLink(
                 $pageIcon .
@@ -120,7 +114,8 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                     $lang->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:db_new.php.after'),
                     ENT_QUOTES | ENT_HTML5
                 ) . ')',
-                'pages', -$this->id
+                'pages',
+                -$this->id
             );
         }
         // New pages at selection position
@@ -176,7 +171,8 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                     )
                 ) {
                     $newRecordIcon = $this->moduleTemplate->getIconFactory()->getIconForRecord(
-                        $table, [],
+                        $table,
+                        [],
                         Icon::SIZE_SMALL
                     )->render();
                     $rowContent = '';
@@ -184,7 +180,8 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                     // Create new link for record:
                     $newLink = $this->renderLink(
                         $newRecordIcon . htmlspecialchars($lang->sL($v['ctrl']['title']), ENT_QUOTES | ENT_HTML5),
-                        $table, $this->id
+                        $table,
+                        $this->id
                     );
                     // If the table is 'tt_content', create link to wizard
                     if ($table === 'tt_content') {
@@ -196,12 +193,14 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                                       ??
                                       'new_content_element';
                         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-                        $url = $uriBuilder->buildUriFromRoute($moduleName,
-                            ['id' => $this->id, 'returnUrl' => GeneralUtility::getIndpEnv('REQUEST_URI')]);
+                        $url = $uriBuilder->buildUriFromRoute(
+                            $moduleName,
+                            ['id' => $this->id, 'returnUrl' => GeneralUtility::getIndpEnv('REQUEST_URI')]
+                        );
                         $rowContent .= '<li>' . $newLink . ' ' . BackendUtility::wrapInHelp(
-                                $table,
-                                ''
-                            ) . '</li><li><a href="' .
+                            $table,
+                            ''
+                        ) . '</li><li><a href="' .
                                        htmlspecialchars($url, ENT_QUOTES | ENT_HTML5) . '">' . $newContentIcon .
                                        htmlspecialchars($lang->getLL('clickForWizard'), ENT_QUOTES | ENT_HTML5) . '</a></li></ul>';
                     } else {
@@ -234,11 +233,11 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                                         $thisTitle = $EM_CONF[$_EXTKEY]['title'];
                                     }
                                     $iconFile[$_EXTKEY] = '<img src="' . PathUtility::getAbsoluteWebPath(
-                                            ExtensionManagementUtility::getExtensionIcon(
-                                                $extPath,
-                                                true
-                                            )
-                                        ) . '" ' . 'width="16" height="16" ' . 'alt="' . $thisTitle . '" />';
+                                        ExtensionManagementUtility::getExtensionIcon(
+                                            $extPath,
+                                            true
+                                        )
+                                    ) . '" ' . 'width="16" height="16" ' . 'alt="' . $thisTitle . '" />';
                                 }
                             }
                             if (empty($thisTitle)) {
@@ -278,14 +277,14 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
         if (isset($pageTS['mod.']['wizards.']['newRecord.']['order'])) {
             $this->newRecordSortList = GeneralUtility::trimExplode(
                 ',',
-                $pageTS['mod.']['wizards.']['newRecord.']['order'], true
+                $pageTS['mod.']['wizards.']['newRecord.']['order'],
+                true
             );
         }
         uksort($this->tRows, [$this, 'sortNewRecordsByConfig']);
         // Compile table row:
         $finalRows = ['<ul class="list-tree">'];
         $finalRows[] = implode('', $startRows);
-
 
         foreach ($this->tRows as $key => $value) {
             $row = '<li>' . $iconFile[$key] . ' <strong>' . $value['title'] . '</strong><ul>';
@@ -314,7 +313,8 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
             foreach ($templates as $template) {
                 $linkRows = [];
                 foreach (['firstSubpage', 'lastSubpage', 'below'] as $position) {
-                    $moduleUrl = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute('create-page-from-template',
+                    $moduleUrl = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute(
+                        'create-page-from-template',
                         [
                             'targetUid' => $this->id,
                             'templateUid' => $template['uid'],
@@ -327,7 +327,6 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                                   '>' .
                                   $this->getLanguageService()->sL('LLL:EXT:pagetemplates/Resources/Private/Language/locallang.xlf:label.create_' . $position) .
                                   '</a></li>';
-
                 }
                 $rows[] = '<li>' . $pageIcon . $template['title'] . '<ul>' . implode('', $linkRows) . '</ul></li>';
             }
@@ -338,7 +337,6 @@ class NewRecordController extends \TYPO3\CMS\Backend\Controller\NewRecordControl
                    '',
                    $rows
                ) . '</ul></li>';
-
     }
 
     /**

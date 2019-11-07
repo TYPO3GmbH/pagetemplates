@@ -21,12 +21,32 @@
         "issues": "https://jira.typo3.com/servicedesk/customer/portal/3/group/41",
         "source": "https://bitbucket.typo3.com/scm/ext/pagetemplates.git"
     },
-    "require": {
-        "typo3/cms-core": "^9.5",
-        "typo3/cms-backend": "^9.5",
-        "typo3/cms-extbase": "^9.5",
-        "symfony/yaml": "~3.4|~4.0",
-        "typo3fluid/fluid": "^2.3"
+    "config": {
+        "sort-packages": true,
+        "discard-changes": true,
+        "vendor-dir": ".build/vendor",
+        "bin-dir": ".build/bin"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "pagetemplates",
+            "app-dir": ".build",
+            "web-dir": ".build/public"
+        }
+    },
+    "scripts": {
+        "t3g:test:php:unit": [
+            "phpunit -c phpunit.xml --testsuite \"Unit Test Suite\""
+        ],
+        "t3g:test": [
+            "@t3g:test:php:unit"
+        ],
+        "t3g:phplint": [
+            "phplint"
+        ],
+        "t3g:cgl": [
+            "php-cs-fixer fix -v --dry-run --using-cache false --diff --diff-format=udiff"
+        ]
     },
     "autoload": {
         "psr-4": {
@@ -38,7 +58,16 @@
             "T3G\\AgencyPack\\Pagetemplates\\Tests\\": "Tests/"
         }
     },
+    "require": {
+        "typo3/cms-core": "^9.5",
+        "typo3/cms-backend": "^9.5",
+        "typo3/cms-extbase": "^9.5",
+        "typo3fluid/fluid": "^2.3"
+    },
     "require-dev": {
-        "phpunit/phpunit": "5.7.5"
+        "bk2k/extension-helper": "^1.0@dev",
+        "friendsofphp/php-cs-fixer": "^2.17@dev",
+        "overtrue/phplint": "dev-master",
+        "typo3/testing-framework": "^4.13"
     }
 }

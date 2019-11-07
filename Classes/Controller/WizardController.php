@@ -1,20 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Pagetemplates\Controller;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
+
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 use T3G\AgencyPack\Pagetemplates\Provider\TemplateProvider;
 use T3G\AgencyPack\Pagetemplates\Service\FormEngineService;
@@ -37,7 +31,6 @@ class WizardController extends AbstractController
      * @var string
      */
     protected $configPath;
-
 
     /**
      * Add flash message if the config directory cannot be found.
@@ -83,7 +76,6 @@ class WizardController extends AbstractController
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
         $messageQueue->addMessage($flashMessage);
     }
-
 
     /**
      * Initialize action
@@ -174,5 +166,4 @@ class WizardController extends AbstractController
 
         $this->redirectToUri($pageModuleUrl);
     }
-
 }
