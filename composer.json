@@ -4,12 +4,12 @@
     "minimum-stability": "dev",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0+",
-    "repositories": {
-        "0": {
+    "repositories": [
+        {
             "type": "composer",
             "url": "https://composer.typo3.org/"
         }
-    },
+    ],
     "authors": [
         {
             "name": "TYPO3 GmbH",
@@ -32,6 +32,9 @@
             "extension-key": "pagetemplates",
             "app-dir": ".build",
             "web-dir": ".build/public"
+        },
+        "branch-alias": {
+            "dev-develop": "1.0.x-dev"
         }
     },
     "scripts": {
