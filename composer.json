@@ -18,38 +18,8 @@
         }
     ],
     "support": {
-        "issues": "https://jira.typo3.com/servicedesk/customer/portal/3/group/41",
-        "source": "https://bitbucket.typo3.com/scm/ext/pagetemplates.git"
-    },
-    "config": {
-        "sort-packages": true,
-        "discard-changes": true,
-        "vendor-dir": ".build/vendor",
-        "bin-dir": ".build/bin"
-    },
-    "extra": {
-        "typo3/cms": {
-            "extension-key": "pagetemplates",
-            "app-dir": ".build",
-            "web-dir": ".build/public"
-        },
-        "branch-alias": {
-            "dev-develop": "1.0.x-dev"
-        }
-    },
-    "scripts": {
-        "t3g:test:php:unit": [
-            "phpunit -c phpunit.xml --testsuite \"Unit Test Suite\""
-        ],
-        "t3g:test": [
-            "@t3g:test:php:unit"
-        ],
-        "t3g:phplint": [
-            "phplint"
-        ],
-        "t3g:cgl": [
-            "php-cs-fixer fix -v --dry-run --using-cache false --diff --diff-format=udiff"
-        ]
+        "issues": "https://github.com/TYPO3GmbH/pagetemplates/issues",
+        "source": "https://github.com/TYPO3GmbH/pagetemplates"
     },
     "autoload": {
         "psr-4": {
@@ -62,15 +32,46 @@
         }
     },
     "require": {
-        "typo3/cms-core": "^9.5",
-        "typo3/cms-backend": "^9.5",
-        "typo3/cms-extbase": "^9.5",
+        "typo3/cms-core": "^9.5 || ^10.4",
+        "typo3/cms-backend": "^9.5 || ^10.4",
+        "typo3/cms-extbase": "^9.5 || ^10.4",
         "typo3fluid/fluid": "^2.3"
     },
     "require-dev": {
         "bk2k/extension-helper": "^1.0@dev",
-        "friendsofphp/php-cs-fixer": "^2.17@dev",
-        "overtrue/phplint": "dev-master",
-        "typo3/testing-framework": "^4.13"
+        "friendsofphp/php-cs-fixer": "^2.14",
+        "roave/security-advisories": "dev-master",
+        "typo3/testing-framework": "^4.9 || ^5.0 || ^6.2",
+        "overtrue/phplint": "^1.1"
+    },
+    "scripts": {
+        "t3g:test:php:lint": [
+            "phplint"
+        ],
+        "t3g:test:php:unit": [
+            "phpunit -c Build/UnitTests.xml"
+        ],
+        "t3g:test": [
+            "@t3g:test:php:lint", "@t3g:test:php:unit"
+        ],
+        "t3g:cgl": [
+            "php-cs-fixer --diff -v fix"
+        ],
+        "post-autoload-dump": [
+            "mkdir -p .build/web/typo3conf/ext/", "[ -L .build/web/typo3conf/ext/pagetemplates ] || ln -snvf ../../../../. .build/web/typo3conf/ext/pagetemplates"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "discard-changes": true,
+        "vendor-dir": ".build/vendor",
+        "bin-dir": ".build/bin"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "pagetemplates",
+            "app-dir": ".build",
+            "web-dir": ".build/public"
+        }
     }
 }
