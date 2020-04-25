@@ -7,10 +7,12 @@ if (!defined('TYPO3_MODE')) {
 call_user_func(
     function () {
         if (TYPO3_MODE === 'BE') {
-            $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates']);
-            if (!$extensionConfiguration['enableSimpleMode']) {
+            $enableSimpleMode = (bool)\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+                \TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class
+            )->get('pagetemplates', 'enableSimpleMode');
+            if (!$enableSimpleMode) {
                 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
-                    'T3G.Pagetemplates',
+                    'T3G.AgencyPack.Pagetemplates',
                     'web',
                     'tx_Pagetemplates',
                     '',

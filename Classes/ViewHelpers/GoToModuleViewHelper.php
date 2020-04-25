@@ -1,24 +1,18 @@
 <?php
 
-namespace T3G\AgencyPack\Pagetemplates\ViewHelpers;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
 
-use TYPO3\CMS\Backend\Utility\BackendUtility;
+namespace T3G\AgencyPack\Pagetemplates\ViewHelpers;
+
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * Go to module viewhelper
@@ -37,26 +31,15 @@ class GoToModuleViewHelper extends AbstractViewHelper
     }
 
     /**
-     * Returns an URL to link to a module.
-     *
-     * @return string URL to FormEngine module + parameters
-     * @see \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl()
-     */
-    public function render()
-    {
-        return static::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
-    }
-
-    /**
      * @param array $arguments
      * @param \Closure $renderChildrenClosure
      * @param RenderingContextInterface $renderingContext
-     *
      * @return string
+     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext)
     {
         $parameters = GeneralUtility::explodeUrl2Array($arguments['parameters']);
-        return BackendUtility::getModuleUrl($arguments['module'], $parameters);
+        return (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute($arguments['module'], $parameters);
     }
 }

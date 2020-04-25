@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/*
+ * This file is part of the package t3g/pagetemplates.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\Pagetemplates\Tests\Unit\Provider;
 
 /*
@@ -26,11 +33,10 @@ class TemplateProviderTest extends TestCase
      * @test
      * @return void
      */
-    public function getTemplatesReturnsTemplateArray()
+    public function getTemplatesReturnsTemplateArray(): void
     {
         $examplePath = __DIR__ . '/../../../Configuration/Templates';
-        $templateProvider = new TemplateProvider($examplePath);
-        $templates = $templateProvider->getTemplates();
+        $templates = (new TemplateProvider($examplePath))->getTemplates();
         $expected = [
             'example1' =>
                 [
@@ -47,5 +53,4 @@ class TemplateProviderTest extends TestCase
         ];
         self::assertSame($expected, $templates);
     }
-
 }

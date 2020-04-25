@@ -1,21 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Pagetemplates\Service;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
 
+namespace T3G\AgencyPack\Pagetemplates\Service;
+
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -30,10 +25,9 @@ class CreatePageFromTemplateService
      */
     public function getTemplatesFromDatabase(): array
     {
-        $extensionConfiguration = unserialize(
-            $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'],
-            ['allowed_classes' => false]
-        );
+        /** @var ExtensionConfiguration $extensionConfigurationService */
+        $extensionConfigurationService = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        $extensionConfiguration = $extensionConfigurationService->get('pagetemplates');
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()
@@ -83,17 +77,17 @@ class CreatePageFromTemplateService
     protected function getManipulatedTargetUidForDataHandler(int $targetUid, string $position): int
     {
         switch ($position) {
-            case 'below';
+            case 'below':
                 $targetUid *= -1;
                 break;
-            case 'lastSubpage';
+            case 'lastSubpage':
                 $uidOfLastSubpage = $this->getUidOfLastSubpage($targetUid);
                 // Only change the target uid, if the current page has at least one subpage.
                 if ($uidOfLastSubpage !== 0) {
                     $targetUid = 0 - $uidOfLastSubpage;
                 }
                 break;
-            case 'firstSubpage';
+            case 'firstSubpage':
                 // Nothing to change here, because this is default.
                 break;
             default:

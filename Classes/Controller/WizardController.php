@@ -1,24 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Pagetemplates\Controller;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
+
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 use T3G\AgencyPack\Pagetemplates\Provider\TemplateProvider;
 use T3G\AgencyPack\Pagetemplates\Service\FormEngineService;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -37,16 +33,15 @@ class WizardController extends AbstractController
      */
     protected $configPath;
 
-
     /**
      * Add flash message if the config directory cannot be found.
      */
-    protected function addNoConfigFoundError()
+    protected function addNoConfigFoundError(): void
     {
         $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_found.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -61,7 +56,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('config_dir_not_set.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_set.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -76,13 +71,12 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('no_page_selected.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('no_page_selected.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
         $messageQueue->addMessage($flashMessage);
     }
-
 
     /**
      * Initialize action
@@ -94,7 +88,10 @@ class WizardController extends AbstractController
 
         $id = (int)$_GET['id'];
         $pagesTSconfig = BackendUtility::getPagesTSconfig($id);
-        $this->configPath = rtrim(GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']), '/');
+        $this->configPath = rtrim(
+            GeneralUtility::getFileAbsFileName($pagesTSconfig['mod.'][self::MODULE_NAME . '.']['storagePath']),
+            '/'
+        );
 
         if ($id === 0) {
             $this->addSelectPageInfo();
@@ -103,13 +100,14 @@ class WizardController extends AbstractController
         } elseif (!is_dir($this->configPath)) {
             $this->addNoConfigFoundError();
         }
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         $this->templateProvider = $this->objectManager->get(TemplateProvider::class, $this->configPath);
     }
 
     /**
      * Display available templates.
      */
-    public function indexAction()
+    public function indexAction(): void
     {
         $templates = $this->templateProvider->getTemplates();
         $this->view->assign('templates', $templates);
@@ -120,20 +118,19 @@ class WizardController extends AbstractController
      *
      * @param string $templateIdentifier
      */
-    public function createAction(string $templateIdentifier)
+    public function createAction(string $templateIdentifier): void
     {
         try {
             $configuration = $this->templateProvider->getTemplateConfiguration($templateIdentifier);
-            $formEngineService = $this->objectManager->get(FormEngineService::class);
-            $forms = $formEngineService->createEditForm($configuration);
+            $forms = $this->objectManager->get(FormEngineService::class)->createEditForm($configuration);
             $this->view->assign('forms', $forms);
         } catch (\InvalidArgumentException $e) {
             if ($e->getCode() === 1483357769811) {
                 $headline = LocalizationUtility::translate('exception.1483357769811.headline', 'pagetemplates');
                 $message = sprintf(
                     LocalizationUtility::translate('exception.1483357769811.message', 'pagetemplates'),
-                    htmlspecialchars($templateIdentifier),
-                    htmlspecialchars(str_replace(PATH_site, '', $this->configPath))
+                    htmlspecialchars($templateIdentifier, ENT_QUOTES | ENT_HTML5),
+                    htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
                 );
                 $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
                 $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -148,7 +145,7 @@ class WizardController extends AbstractController
      * save template as new page
      * and send the user to the page module.
      */
-    public function saveNewPageAction()
+    public function saveNewPageAction(): void
     {
         $tce = GeneralUtility::makeInstance(DataHandler::class);
         $data = $_POST['data'];
@@ -156,14 +153,18 @@ class WizardController extends AbstractController
         foreach ($data as $table => &$elements) {
             arsort($elements);
         }
+        unset($elements);
         $newPageIdentifier = key($data['pages']);
         $tce->start($data, []);
         $tce->process_datamap();
         BackendUtility::setUpdateSignal('updatePageTree');
         $realPid = $tce->substNEWwithIDs[$newPageIdentifier];
 
-        $pageModuleUrl = BackendUtility::getModuleUrl('web_layout', ['id' => $realPid]);
+        $pageModuleUrl = (string)GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute(
+            'web_layout',
+            ['id' => $realPid]
+        );
+
         $this->redirectToUri($pageModuleUrl);
     }
-
 }

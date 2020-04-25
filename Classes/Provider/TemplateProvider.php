@@ -1,20 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Pagetemplates\Provider;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
+
+namespace T3G\AgencyPack\Pagetemplates\Provider;
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -51,7 +45,10 @@ class TemplateProvider
             $configuration = Yaml::parse($content);
             $configuration['__identifier'] = $templateIdentifier;
         } else {
-            throw new \InvalidArgumentException('Template not found:' . htmlspecialchars($templatePath), 1483357769811);
+            throw new \InvalidArgumentException(
+                'Template not found:' . htmlspecialchars($templatePath, ENT_QUOTES | ENT_HTML5),
+                1483357769811
+            );
         }
         return $configuration;
     }
@@ -65,9 +62,12 @@ class TemplateProvider
     {
         $files = $this->getYamlFilesInFolder($this->configurationPath);
         $templates = [];
-        foreach ($files as $file) {
-            $content = file_get_contents($file);
-            $templates = array_merge($templates, Yaml::parse($content));
+        if (count($files) > 0) {
+            foreach ($files as $file) {
+                $content = file_get_contents($file);
+                $templates[] = Yaml::parse($content);
+            }
+            $templates = array_merge(...$templates);
         }
         return $templates;
     }

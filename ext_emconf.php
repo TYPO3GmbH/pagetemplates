@@ -6,7 +6,7 @@ $EM_CONF[$_EXTKEY] = [
     'category' => 'extension',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.6.0-8.99.99'
+            'typo3' => '9.5.0-10.4.99'
         ],
         'conflicts' => [
         ],
@@ -23,5 +23,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Susanne Moog',
     'author_email' => 'susanne.moog@typo3.com',
     'author_company' => 'TYPO3 GmbH',
-    'version' => '0.0.1',
+    'version' => '1.2.0',
 ];

@@ -1,20 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Pagetemplates\Controller;
-
 /*
- * This file is part of the TYPO3 CMS project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
+ * This file is part of the package t3g/pagetemplates.
  *
  * For the full copyright and license information, please read the
- * LICENSE.txt file that was distributed with this source code.
- *
- * The TYPO3 project - inspiring people to share!
+ * LICENSE file that was distributed with this source code.
  */
+
+namespace T3G\AgencyPack\Pagetemplates\Controller;
 
 use T3G\AgencyPack\Pagetemplates\Repository\PageRepository;
 
@@ -30,7 +24,7 @@ class ManagementController extends AbstractController
      *
      * @param PageRepository $pageRepository
      */
-    public function injectPageRepository(PageRepository $pageRepository)
+    public function injectPageRepository(PageRepository $pageRepository): void
     {
         $this->pageRepository = $pageRepository;
     }
@@ -38,7 +32,7 @@ class ManagementController extends AbstractController
     /**
      * Action to display pages based on templates
      */
-    public function basedOnAction()
+    public function basedOnAction(): void
     {
         $pagesBasedOnTemplates = $this->pageRepository->getPagesBasedOnTemplates();
         $this->view
