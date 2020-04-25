@@ -14,6 +14,7 @@ use T3G\AgencyPack\Pagetemplates\Provider\TemplateProvider;
 use T3G\AgencyPack\Pagetemplates\Service\FormEngineService;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -40,7 +41,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('config_dir_not_found.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_found.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -55,7 +56,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('config_dir_not_set.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('config_dir_not_set.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -70,7 +71,7 @@ class WizardController extends AbstractController
         $headline = LocalizationUtility::translate('no_page_selected.headline', 'pagetemplates');
         $message = sprintf(
             LocalizationUtility::translate('no_page_selected.message', 'pagetemplates'),
-            htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
+            htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
         );
         $flashMessage = new FlashMessage($message, $headline, FlashMessage::INFO);
         $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();
@@ -129,7 +130,7 @@ class WizardController extends AbstractController
                 $message = sprintf(
                     LocalizationUtility::translate('exception.1483357769811.message', 'pagetemplates'),
                     htmlspecialchars($templateIdentifier, ENT_QUOTES | ENT_HTML5),
-                    htmlspecialchars(str_replace(PATH_site, '', $this->configPath), ENT_QUOTES | ENT_HTML5)
+                    htmlspecialchars(str_replace(Environment::getPublicPath() . '/', '', $this->configPath), ENT_QUOTES | ENT_HTML5)
                 );
                 $flashMessage = new FlashMessage($message, $headline, FlashMessage::ERROR);
                 $messageQueue = $this->flashMessageService->getMessageQueueByIdentifier();

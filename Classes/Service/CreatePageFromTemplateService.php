@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace T3G\AgencyPack\Pagetemplates\Service;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -24,10 +25,9 @@ class CreatePageFromTemplateService
      */
     public function getTemplatesFromDatabase(): array
     {
-        $extensionConfiguration = unserialize(
-            $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['pagetemplates'],
-            ['allowed_classes' => false]
-        );
+        /** @var ExtensionConfiguration $extensionConfigurationService */
+        $extensionConfigurationService = GeneralUtility::makeInstance(ExtensionConfiguration::class);
+        $extensionConfiguration = $extensionConfigurationService->get('pagetemplates');
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('pages');
         $queryBuilder->getRestrictions()
